@@ -1,5 +1,5 @@
 Plottle — Documentation
-======================
+========================
 
 **Version:** |release|
 
