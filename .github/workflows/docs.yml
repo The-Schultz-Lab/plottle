@@ -35,11 +35,9 @@ jobs:
           name: html-docs
           path: docs/_build/html
 
-      # Deploy to GitHub Pages — requires a public repo or paid GitHub plan.
-      # Re-enable when the repo is made public.
-      # - name: Deploy to GitHub Pages
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   if: github.ref == 'refs/heads/main'
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: docs/_build/html
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html
