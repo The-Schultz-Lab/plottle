@@ -30,7 +30,7 @@ jobs:
           sphinx-build -b html . _build/html -W --keep-going
 
       - name: Upload docs artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: html-docs
           path: docs/_build/html
