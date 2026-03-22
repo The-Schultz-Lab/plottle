@@ -58,12 +58,17 @@ templates_path = ["_templates"]
 
 # -- HTML output ---------------------------------------------------------------
 
-html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
 
 html_theme_options = {
-    "navigation_depth": 3,
-    "titles_only": False,
-    "collapse_navigation": False,
+    "light_css_variables": {
+        "color-brand-primary": "#5a0010",
+        "color-brand-content": "#5a0010",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "#e0a3a3",
+        "color-brand-content": "#e0a3a3",
+    },
 }
 
 html_static_path = ["_static"]
