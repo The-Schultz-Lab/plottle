@@ -1,0 +1,196 @@
+[
+  {
+    "key": "histogram",
+    "title": "Histogram",
+    "description": "Distribution of temperature measurements with 30 bins.",
+    "best_for": "Single-variable distributions",
+    "dataset": "normal_distribution.csv",
+    "library": "Matplotlib",
+    "filename": "histogram.png",
+    "config": {
+      "title": "Temperature Distribution",
+      "xlabel": "Temperature (K)",
+      "ylabel": "Count",
+      "bins": "30",
+      "color": "#1f77b4"
+    }
+  },
+  {
+    "key": "line_plot",
+    "title": "Line Plot",
+    "description": "Sine and cosine waves over 0\u20134\u03c0 with per-series colour.",
+    "best_for": "Time series, ordered data, multi-trace",
+    "dataset": "sine_cosine_waves.csv",
+    "library": "Matplotlib",
+    "filename": "line_plot.png",
+    "config": {
+      "title": "Sine & Cosine Waves",
+      "xlabel": "x (rad)",
+      "ylabel": "Amplitude"
+    }
+  },
+  {
+    "key": "scatter_plot",
+    "title": "Scatter Plot",
+    "description": "Reaction time vs product yield showing a positive correlation.",
+    "best_for": "Correlation, two-variable comparison",
+    "dataset": "scatter_correlation.csv",
+    "library": "Matplotlib",
+    "filename": "scatter_plot.png",
+    "config": {
+      "title": "Reaction Time vs Yield",
+      "xlabel": "Reaction Time (s)",
+      "ylabel": "Yield (%)",
+      "alpha": "0.7"
+    }
+  },
+  {
+    "key": "heatmap",
+    "title": "Heatmap",
+    "description": "10\u00d710 correlation matrix with colour encoding and cell annotations.",
+    "best_for": "2-D matrices, correlation tables",
+    "dataset": "correlation_matrix.npy",
+    "library": "Matplotlib",
+    "filename": "heatmap.png",
+    "config": {
+      "title": "Correlation Matrix",
+      "cmap": "coolwarm",
+      "vmin": "-1",
+      "vmax": "1"
+    }
+  },
+  {
+    "key": "contour_plot",
+    "title": "Contour Plot",
+    "description": "Filled contours of a double-Gaussian potential energy surface.",
+    "best_for": "Scalar fields, PES, 2-D functions",
+    "dataset": "gaussian_surface.npy",
+    "library": "Matplotlib",
+    "filename": "contour_plot.png",
+    "config": {
+      "title": "Gaussian Potential Energy Surface",
+      "xlabel": "x",
+      "ylabel": "y",
+      "levels": "20",
+      "cmap": "viridis",
+      "filled": "True",
+      "colorbar": "True"
+    }
+  },
+  {
+    "key": "distribution_plot",
+    "title": "Distribution (KDE)",
+    "description": "Kernel density estimate of a bimodal absorbance distribution.",
+    "best_for": "Overlaid distributions, KDE, ECDF",
+    "dataset": "bimodal_distribution.csv",
+    "library": "Seaborn",
+    "filename": "distribution_plot.png",
+    "config": {
+      "title": "Bimodal Absorbance Distribution",
+      "xlabel": "Absorbance (a.u.)",
+      "kind": "kde",
+      "fill": "True"
+    }
+  },
+  {
+    "key": "box_plot",
+    "title": "Box / Violin Plot",
+    "description": "Yield distributions grouped by catalyst type.",
+    "best_for": "Group comparisons, outlier detection",
+    "dataset": "grouped_categorical.csv",
+    "library": "Seaborn",
+    "filename": "box_plot.png",
+    "config": {
+      "title": "Yield by Catalyst",
+      "xlabel": "Catalyst",
+      "ylabel": "Yield (%)",
+      "x": "catalyst",
+      "y": "yield_pct",
+      "kind": "box"
+    }
+  },
+  {
+    "key": "regression_plot",
+    "title": "Regression Plot",
+    "description": "Linear regression of yield vs temperature with 95% confidence band.",
+    "best_for": "Trend lines, linear modelling",
+    "dataset": "scatter_correlation.csv",
+    "library": "Seaborn",
+    "filename": "regression_plot.png",
+    "config": {
+      "title": "Yield vs Temperature (Regression)",
+      "xlabel": "Temperature (\u00b0C)",
+      "ylabel": "Yield (%)"
+    }
+  },
+  {
+    "key": "interactive_histogram",
+    "title": "Interactive Histogram",
+    "description": "Zoomable histogram with hover counts.",
+    "best_for": "Exploratory data analysis",
+    "dataset": "normal_distribution.csv",
+    "library": "Plotly",
+    "filename": "interactive_histogram.png",
+    "config": {
+      "title": "Interactive Temperature Histogram",
+      "xlabel": "Temperature (K)",
+      "ylabel": "Count"
+    }
+  },
+  {
+    "key": "interactive_scatter",
+    "title": "Interactive Scatter",
+    "description": "Click-to-annotate scatter with hover coordinates.",
+    "best_for": "Interactive correlation exploration",
+    "dataset": "scatter_correlation.csv",
+    "library": "Plotly",
+    "filename": "interactive_scatter.png",
+    "config": {
+      "title": "Interactive Scatter",
+      "xlabel": "Reaction Time (s)",
+      "ylabel": "Yield (%)"
+    }
+  },
+  {
+    "key": "interactive_line",
+    "title": "Interactive Line",
+    "description": "Multi-trace interactive line chart with legend toggle.",
+    "best_for": "Interactive time-series comparison",
+    "dataset": "sine_cosine_waves.csv",
+    "library": "Plotly",
+    "filename": "interactive_line.png",
+    "config": {
+      "title": "Interactive Sine & Cosine",
+      "xlabel": "x (rad)",
+      "ylabel": "Amplitude"
+    }
+  },
+  {
+    "key": "interactive_heatmap",
+    "title": "Interactive Heatmap",
+    "description": "Hover-enabled correlation matrix.",
+    "best_for": "Interactive matrix inspection",
+    "dataset": "correlation_matrix.npy",
+    "library": "Plotly",
+    "filename": "interactive_heatmap.png",
+    "config": {
+      "title": "Interactive Correlation Matrix",
+      "colorscale": "RdBu",
+      "zmin": "-1",
+      "zmax": "1"
+    }
+  },
+  {
+    "key": "interactive_3d_surface",
+    "title": "3D Surface",
+    "description": "Rotatable 3-D potential energy surface.",
+    "best_for": "3-D data exploration",
+    "dataset": "gaussian_surface.npy",
+    "library": "Plotly",
+    "filename": "interactive_3d_surface.png",
+    "config": {
+      "title": "3D Gaussian Surface",
+      "colorscale": "Viridis"
+    }
+  }
+]

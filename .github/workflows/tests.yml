@@ -1,0 +1,91 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install lint tools
+        run: pip install ruff mypy types-PyYAML types-requests
+
+      - name: ruff check
+        run: ruff check modules/ cli.py __init__.py
+
+      - name: ruff format check
+        run: ruff format --check modules/ cli.py __init__.py
+
+      - name: mypy check
+        run: |
+          mypy \
+            modules/io.py \
+            modules/math.py \
+            modules/plotting.py \
+            modules/signal.py \
+            modules/peaks.py \
+            modules/data_tools.py \
+            modules/annotations.py \
+            modules/batch.py \
+            modules/report.py \
+            modules/plugin_loader.py \
+            modules/spectroscopy.py \
+            modules/nist.py \
+            cli.py \
+            --ignore-missing-imports --no-strict-optional --explicit-package-bases
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests with coverage
+        env:
+          MPLBACKEND: Agg
+        run: |
+          pytest \
+            tests/test_io.py \
+            tests/test_math.py \
+            tests/test_plotting.py \
+            tests/test_plotting_advanced.py \
+            tests/test_utils.py \
+            tests/test_signal.py \
+            tests/test_peaks.py \
+            tests/test_data_tools.py \
+            tests/test_annotations.py \
+            tests/test_spectroscopy.py \
+            tests/test_molecular_parsers.py \
+            tests/test_batch.py \
+            tests/test_report.py \
+            tests/test_plugin_loader.py \
+            tests/test_nist.py \
+            --cov=modules \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            -v
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml

@@ -1,0 +1,33 @@
+{
+  "tasks": [
+    {
+      "name": "Generate Histogram",
+      "command": "plot",
+      "input": "examples/data/coordinates.npy",
+      "type": "histogram",
+      "output": "examples/plots/batch_histogram.png",
+      "title": "Coordinate Distribution",
+      "bins": 50,
+      "xlabel": "Value",
+      "ylabel": "Frequency"
+    },
+    {
+      "name": "Calculate Statistics",
+      "command": "stats",
+      "input": "examples/data/experimental_data.csv",
+      "column": "Temperature (K)",
+      "output": "examples/plots/batch_stats.json",
+      "normality": true
+    },
+    {
+      "name": "Create Line Plot",
+      "command": "plot",
+      "input": "examples/data/experimental_data.csv",
+      "type": "line",
+      "output": "examples/plots/batch_line.png",
+      "title": "Experimental Data",
+      "xlabel": "Index",
+      "ylabel": "Value"
+    }
+  ]
+}

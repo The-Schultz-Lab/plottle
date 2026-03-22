@@ -1,0 +1,25 @@
+# Plottle — Streamlit configuration
+
+# ── NCCU theme ────────────────────────────────────────────────────────────────
+# primaryColor:           soft rose — accent, tab underlines, active states
+# backgroundColor:        near-black main canvas
+# secondaryBackgroundColor: deep maroon — sidebar and card backgrounds
+# textColor:              white
+[theme]
+base = "dark"
+primaryColor = "#e0a3a3"
+backgroundColor = "#1b1b1b"
+secondaryBackgroundColor = "#240000"
+textColor = "#ffffff"
+
+[server]
+maxUploadSize = 200
+enableCORS = true
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false
+
+[runner]
+fastReruns = true
+enforceSerializableSessionState = false
