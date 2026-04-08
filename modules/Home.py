@@ -33,10 +33,10 @@ import sys
 import streamlit as st
 from pathlib import Path
 
-_REPO_ROOT = Path(__file__).parent.parent
+_REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
-_PAGES_DIR = Path(__file__).parent / "pages"
+_PAGES_DIR = Path(__file__).resolve().parent / "pages"
 _LOGO_PNG = _REPO_ROOT / "logo.png"
 _ASSETS_DIR = _REPO_ROOT / "assets"
 _NCCU_HORIZ = _ASSETS_DIR / "nccu-horiz-logo.png"
@@ -154,17 +154,6 @@ def _home_page() -> None:
         else:
             st.info("No dataset loaded.")
             st.page_link(data_pg, label="Upload Data →")
-
-        # ── NCCU wings — bottom right ─────────────────────────────────────────
-        if _NCCU_WINGS.exists():
-            _spacer, _wings_col = st.columns([3, 1])
-            with _wings_col:
-                _wings_b64 = base64.b64encode(_NCCU_WINGS.read_bytes()).decode()
-                st.markdown(
-                    f'<img src="data:image/png;base64,{_wings_b64}"'
-                    ' style="width:100%;height:auto;opacity:0.85;">',
-                    unsafe_allow_html=True,
-                )
 
     with tab_help:
         st.markdown("## Quick Start")
@@ -381,7 +370,14 @@ with st.sidebar:
             _horiz_b64 = base64.b64encode(_NCCU_HORIZ.read_bytes()).decode()
             st.markdown(
                 f'<img src="data:image/png;base64,{_horiz_b64}"'
-                ' style="width:100%;height:auto;margin-bottom:0.6rem;">',
+                ' style="width:100%;height:auto;margin-bottom:0.4rem;">',
+                unsafe_allow_html=True,
+            )
+        if _NCCU_WINGS.exists():
+            _wings_b64 = base64.b64encode(_NCCU_WINGS.read_bytes()).decode()
+            st.markdown(
+                f'<img src="data:image/png;base64,{_wings_b64}"'
+                ' style="width:60%;height:auto;display:block;margin:0 auto 0.4rem;">',
                 unsafe_allow_html=True,
             )
         st.markdown(

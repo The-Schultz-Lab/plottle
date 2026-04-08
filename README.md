@@ -1,6 +1,7 @@
 # Plottle
 
 [![Tests](https://github.com/The-Schultz-Lab/plottle/actions/workflows/tests.yml/badge.svg)](https://github.com/The-Schultz-Lab/plottle/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/plottle)](https://pypi.org/project/plottle/)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/The-Schultz-Lab/plottle/main)
 
 A general-purpose Python toolkit for scientific data visualization and analysis, developed for research and teaching in computational science at North Carolina Central University.
@@ -18,14 +19,29 @@ Plottle provides a unified interface for scientific data work:
 
 ## Quick Start
 
-### 1 — Clone and enter the repository
+### Clone the repository
+
+#### 1 — Clone and enter the repository
 
 ```bash
 git clone https://github.com/The-Schultz-Lab/plottle.git
 cd plottle
 ```
 
-### 2 — Create a virtual environment and install
+#### 2 — Set up and launch (double-click, no terminal needed)
+
+**Windows:**
+1. Double-click **`setup.bat`** — creates the virtual environment and installs all dependencies.
+2. Double-click **`launch.bat`** — starts Plottle. Use this every time you want to open the app.
+
+**macOS:**
+1. Double-click **`setup.command`** — creates the virtual environment and installs all dependencies.
+   *(If macOS asks "Are you sure you want to open it?", click Open.)*
+2. Double-click **`launch.command`** — starts Plottle. Use this every time you want to open the app.
+
+After the app starts, open **`http://localhost:8501`** in your browser (Streamlit usually opens it automatically).
+
+#### 2 (alternative) — Set up and launch from the terminal
 
 ```bash
 python -m venv .venv
@@ -37,21 +53,11 @@ pip install -r requirements.txt
 # macOS / Linux
 source .venv/bin/activate
 pip install -r requirements.txt
-```
 
-### 3 — Launch the GUI
-
-```bash
-# Windows (double-click or terminal)
-launch.bat
-
-# Any platform
 streamlit run modules/Home.py
 ```
 
-Open `http://localhost:8501` in your browser.
-
-### 4 — Or use the CLI
+#### 3 — Or use the CLI
 
 ```bash
 python cli.py --help
@@ -105,11 +111,8 @@ See the [CLI Tutorial](docs/tutorials/cli_guide.md) for full usage and examples.
 Plottle's modules can be used directly in scripts or Jupyter notebooks:
 
 ```python
-import sys
-sys.path.insert(0, 'path/to/plottle')
-
-from modules.io import load_data
-from modules.plotting import line_plot, save_figure
+from plottle.io import load_data
+from plottle.plotting import line_plot, save_figure
 import numpy as np
 
 wavelength = np.linspace(400, 800, 200)
@@ -130,18 +133,18 @@ save_figure(fig, 'spectrum.png', dpi=300)
 
 | Module | Description |
 | --- | --- |
-| `modules.io` | `load_data()` / `save_data()` — auto-detects format from extension |
-| `modules.math` | 25 functions — statistics, curve fitting, hypothesis tests, optimization, linear algebra |
-| `modules.plotting` | 26 plot types; Matplotlib → `(fig, ax, info)`, Plotly → `(fig, info)` |
-| `modules.signal` | 16 functions — smoothing, filtering, FFT, derivatives, baseline correction, interpolation |
-| `modules.peaks` | 5 functions — find, integrate, FWHM, fit (Gaussian/Lorentzian/Voigt/pseudo-Voigt) |
-| `modules.data_tools` | 12 non-destructive DataFrame operations |
-| `modules.spectroscopy` | 18 functions — IR/Raman, UV-Vis, NMR, MS |
-| `modules.nist` | NIST WebBook integration — fetch IR spectra by CAS number |
-| `modules.batch` | Batch load, statistics, curve fit, peak analysis |
-| `modules.annotations` | 7 overlay types (hline, vline, hspan, vspan, text, rectangle, ellipse) |
-| `modules.report` | PDF report generation via `matplotlib.PdfPages` |
-| `modules.molecular` | CPK atom data, Gaussian/ORCA/Molden parsers, Plotly 3D molecule builder |
+| `plottle.io` | `load_data()` / `save_data()` — auto-detects format from extension |
+| `plottle.math` | 25 functions — statistics, curve fitting, hypothesis tests, optimization, linear algebra |
+| `plottle.plotting` | 26 plot types; Matplotlib → `(fig, ax, info)`, Plotly → `(fig, info)` |
+| `plottle.signal` | 16 functions — smoothing, filtering, FFT, derivatives, baseline correction, interpolation |
+| `plottle.peaks` | 5 functions — find, integrate, FWHM, fit (Gaussian/Lorentzian/Voigt/pseudo-Voigt) |
+| `plottle.data_tools` | 12 non-destructive DataFrame operations |
+| `plottle.spectroscopy` | 18 functions — IR/Raman, UV-Vis, NMR, MS |
+| `plottle.nist` | NIST WebBook integration — fetch IR spectra by CAS number |
+| `plottle.batch` | Batch load, statistics, curve fit, peak analysis |
+| `plottle.annotations` | 7 overlay types (hline, vline, hspan, vspan, text, rectangle, ellipse) |
+| `plottle.report` | PDF report generation via `matplotlib.PdfPages` |
+| `plottle.molecular` | CPK atom data, Gaussian/ORCA/Molden parsers, Plotly 3D molecule builder |
 
 ## Plugin System
 
@@ -168,7 +171,7 @@ See [`plugins/plugin_example.py`](plugins/plugin_example.py) for the starter tem
 
 | Package | Purpose |
 | --- | --- |
-| `statsmodels` | Two-way ANOVA (`anova_twoway` in `modules.math`) |
+| `statsmodels` | Two-way ANOVA (`anova_twoway` in `plottle.math`) |
 | `pymzml` | mzML/mzXML mass spectrometry files |
 | `jcamp` | Alternative JCAMP-DX parser |
 
@@ -204,7 +207,8 @@ plottle/
 ├── example-data/                   ← generated sample datasets
 ├── requirements.txt
 ├── pyproject.toml
-└── launch.bat                      ← Windows one-click launcher
+├── setup.bat / setup.command       ← First-run setup (Windows / macOS — double-click)
+└── launch.bat / launch.command     ← App launcher (Windows / macOS — double-click)
 ```
 
 ## Documentation

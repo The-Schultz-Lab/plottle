@@ -184,6 +184,9 @@ cython_debug/
 config.json
 .claude/settings.local.json
 
+# Plottle — local AI working context (not for public repo)
+CLAUDE.md
+
 # Plottle — generated test artifacts (should never be committed)
 tests/*.png
 tests/*.json
