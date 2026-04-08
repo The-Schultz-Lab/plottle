@@ -6,6 +6,30 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [2.0.1] - 2026-04-08
+
+### Fixed
+
+- Session save/load: wrap DataFrame JSON string in `io.StringIO` before passing to
+  `pd.read_json()`, fixing a `FileNotFoundError` on pandas 2.x where a bare string
+  argument is now treated as a file path rather than inline content
+  (`modules/utils/session_state.py`)
+
+### Changed
+
+- Added macOS one-click setup and launch scripts (`setup.command`, `launch.command`)
+- Updated `launch.bat` to check for the virtual environment and print a helpful error
+  if it is missing
+- README: added platform-specific setup/launch instructions, PyPI badge, and updated
+  programmatic import examples to use `plottle.*` namespace
+- `pyproject.toml`: bumped minimum `setuptools` to 78.0, normalized `license` field
+  to PEP 639 format, corrected author email, added `build`/`twine` dev dependencies
+  and changelog URL
+- `modules/Home.py`: use `.resolve()` for path construction (improves symlink and
+  working-directory robustness); moved NCCU wings logo to sidebar
+
+---
+
 ## [2.0.0] - 2026-03-17
 
 ### Added

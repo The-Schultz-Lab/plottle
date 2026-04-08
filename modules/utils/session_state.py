@@ -38,6 +38,7 @@ Examples
 >>> dataset = get_current_dataset()
 """
 
+import io
 import streamlit as st
 import json
 import pickle
@@ -297,7 +298,7 @@ def _deserialize_data(data: Any) -> Any:
     if isinstance(data, dict):
         if "__type__" in data:
             if data["__type__"] == "DataFrame":
-                return pd.read_json(data["__data__"], orient="split")
+                return pd.read_json(io.StringIO(data["__data__"]), orient="split")
             elif data["__type__"] == "ndarray":
                 return pickle.loads(base64.b64decode(data["__data__"]))
             elif data["__type__"] == "pickled":

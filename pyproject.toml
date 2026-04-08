@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plottle"
-version = "2.0.0"
+version = "2.0.1"
 description = "A general-purpose Python toolkit for scientific data visualization and analysis"
 readme = "README.md"
 license = "MIT"
