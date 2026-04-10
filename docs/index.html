@@ -9,7 +9,7 @@
   <meta property="og:description" content="Scientific data visualization for Python — Matplotlib, Seaborn, and Plotly behind one clean API and a point-and-click GUI.">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#1a0c0e">
   <style>
     /* ── Reset & Base ───────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -65,12 +65,12 @@
       transition: all 0.18s ease; cursor: pointer; white-space: nowrap;
     }
     .btn--primary {
-      background: #7c3aed; color: #ffffff;
-      box-shadow: 0 1px 4px rgba(124,58,237,0.35);
+      background: #8B1A2B; color: #ffffff;
+      box-shadow: 0 1px 4px rgba(139,26,43,0.35);
     }
     .btn--primary:hover {
-      background: #6d28d9;
-      box-shadow: 0 4px 18px rgba(124,58,237,0.55);
+      background: #7A1625;
+      box-shadow: 0 4px 18px rgba(139,26,43,0.55);
       transform: translateY(-1px);
     }
     .btn--outline {
@@ -93,14 +93,14 @@
       display: inline-flex; align-items: center;
       padding: 0.25rem 0.8rem; border-radius: 999px;
       font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em;
-      background: rgba(124,58,237,0.15);
-      border: 1px solid rgba(124,58,237,0.35);
-      color: #c4b5fd;
+      background: rgba(139,26,43,0.15);
+      border: 1px solid rgba(139,26,43,0.35);
+      color: #f5b0b6;
     }
     .pill--pink {
-      background: rgba(219,39,119,0.13);
-      border-color: rgba(219,39,119,0.35);
-      color: #f9a8d4;
+      background: rgba(197,160,40,0.15);
+      border-color: rgba(197,160,40,0.40);
+      color: #F0B429;
     }
     .badge {
       display: inline-flex; align-items: center;
@@ -109,14 +109,14 @@
     }
     .badge--full    { background: #d1fae5; color: #065f46; }
     .badge--partial { background: #fef3c7; color: #92400e; }
-    .badge--pypi    { background: #ede9fe; color: #5b21b6; }
+    .badge--pypi    { background: #ede9fe; color: #6B1527; }
 
     /* ── Hero ───────────────────────────────────────────────────────────── */
     .hero {
       background:
-        radial-gradient(ellipse 75% 55% at 72% 42%, rgba(124,58,237,0.18) 0%, transparent 60%),
-        radial-gradient(ellipse 55% 75% at 18% 62%, rgba(219,39,119,0.10) 0%, transparent 54%),
-        linear-gradient(158deg, #0f172a 0%, #130c1e 55%, #0f172a 100%);
+        radial-gradient(ellipse 75% 55% at 72% 42%, rgba(139,26,43,0.22) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 75% at 18% 62%, rgba(197,160,40,0.12) 0%, transparent 54%),
+        linear-gradient(158deg, #0f172a 0%, #1a0c0e 55%, #0f172a 100%);
       padding: 5.5rem 0 5rem;
       overflow: hidden;
     }
@@ -147,13 +147,13 @@
     }
 
     /* Animated chart SVG */
-    .chart-svg { width: 270px; height: 230px; }
+    .chart-svg { width: 270px; height: 245px; }
     .chart-line {
       fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
     }
-    .chart-line--main { stroke: #a78bfa; stroke-dasharray: 320; stroke-dashoffset: 320; }
-    .chart-line--secondary { stroke: #f9a8d4; stroke-dasharray: 280; stroke-dashoffset: 280; }
-    .chart-line--tertiary { stroke: #67e8f9; stroke-dasharray: 260; stroke-dashoffset: 260; }
+    .chart-line--main { stroke: #D94054; stroke-dasharray: 320; stroke-dashoffset: 320; }
+    .chart-line--secondary { stroke: #F0B429; stroke-dasharray: 280; stroke-dashoffset: 280; }
+    .chart-line--tertiary { stroke: #A8B8C8; stroke-dasharray: 260; stroke-dashoffset: 260; }
     @keyframes drawLine {
       to { stroke-dashoffset: 0; }
     }
@@ -212,14 +212,14 @@
     }
     .card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 4px 8px rgba(0,0,0,.07), 0 14px 36px rgba(124,58,237,.15);
+      box-shadow: 0 4px 8px rgba(0,0,0,.07), 0 14px 36px rgba(139,26,43,.15);
     }
     .feature-card__icon {
       width: 48px; height: 48px; border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.5rem; margin-bottom: 1.1rem;
-      background: linear-gradient(135deg, rgba(124,58,237,0.10), rgba(219,39,119,0.08));
-      border: 1px solid rgba(124,58,237,0.12);
+      background: linear-gradient(135deg, rgba(139,26,43,0.10), rgba(197,160,40,0.08));
+      border: 1px solid rgba(139,26,43,0.12);
     }
     .feature-card__title {
       font-size: 1.0625rem; font-weight: 700;
@@ -238,12 +238,12 @@
     @media (max-width: 400px) { .stat-strip { grid-template-columns: 1fr; } }
     .stat-card {
       text-align: center; padding: 1.5rem 1rem;
-      background: linear-gradient(135deg, rgba(124,58,237,0.05), rgba(219,39,119,0.04));
-      border: 1px solid rgba(124,58,237,0.12);
+      background: linear-gradient(135deg, rgba(139,26,43,0.05), rgba(197,160,40,0.04));
+      border: 1px solid rgba(139,26,43,0.12);
       border-radius: 14px;
     }
     .stat-card__num {
-      font-size: 2.25rem; font-weight: 800; color: #7c3aed;
+      font-size: 2.25rem; font-weight: 800; color: #8B1A2B;
       letter-spacing: -0.04em; line-height: 1;
     }
     .stat-card__label { font-size: 0.8125rem; color: #64748b; margin-top: 0.35rem; font-weight: 500; }
@@ -310,7 +310,7 @@
     .c { color: #8b949e; }   /* comment */
     .k { color: #ff7b72; }   /* keyword */
     .s { color: #a5d6ff; }   /* string */
-    .p { color: #c792ea; }   /* prompt / special / purple */
+    .p { color: #C5A028; }   /* prompt / special / purple */
     .n { color: #79c0ff; }   /* name / blue */
 
     /* ── Callout ────────────────────────────────────────────────────────── */
@@ -319,8 +319,8 @@
       border-radius: 10px; border-left: 4px solid;
       font-size: 0.9375rem; line-height: 1.65;
     }
-    .callout--info { background: #f5f3ff; border-color: #7c3aed; color: #3b0764; }
-    .callout a { color: #6d28d9; font-weight: 600; }
+    .callout--info { background: #fdf4f5; border-color: #8B1A2B; color: #3d0a10; }
+    .callout a { color: #7A1625; font-weight: 600; }
 
     /* ── Two-col install layout ─────────────────────────────────────────── */
     .install-grid {
@@ -340,8 +340,8 @@
     }
     .type-pill {
       padding: 0.35rem 0.9rem; border-radius: 999px;
-      background: #f5f3ff; border: 1px solid #ddd6fe;
-      color: #5b21b6; font-size: 0.8125rem; font-weight: 600;
+      background: #fdf4f5; border: 1px solid #f0bec2;
+      color: #6B1527; font-size: 0.8125rem; font-weight: 600;
     }
 
     /* ── Format category chips ──────────────────────────────────────────── */
@@ -421,14 +421,12 @@
           <span class="hero__stat">900+ tests</span>
           <span class="hero__sep">&middot;</span>
           <span class="hero__stat">MIT License</span>
-          <span class="hero__sep">&middot;</span>
-          <span class="hero__stat">PyPI</span>
         </div>
       </div>
 
       <!-- Animated line chart -->
       <div class="hero__visual" aria-hidden="true">
-        <svg class="chart-svg" viewBox="0 0 270 230" xmlns="http://www.w3.org/2000/svg">
+        <svg class="chart-svg" viewBox="0 0 270 245" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="5" result="blur"/>
@@ -438,7 +436,7 @@
 
           <!-- Chart frame -->
           <rect x="22" y="14" width="232" height="170" rx="8"
-                fill="rgba(15,23,42,0.55)" stroke="rgba(124,58,237,0.20)" stroke-width="1"/>
+                fill="rgba(15,23,42,0.55)" stroke="rgba(139,26,43,0.28)" stroke-width="1"/>
 
           <!-- Grid lines (horizontal) -->
           <line x1="30" y1="55"  x2="246" y2="55"  stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
@@ -453,8 +451,8 @@
           <!-- Area fill under main line (gradient) -->
           <defs>
             <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.22"/>
-              <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.02"/>
+              <stop offset="0%" stop-color="#8B1A2B" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#8B1A2B" stop-opacity="0.02"/>
             </linearGradient>
           </defs>
           <path d="M 48 148 C 70 130, 90 80, 115 65 S 155 90, 180 55 S 215 70, 240 42 L 240 176 L 48 176 Z"
@@ -474,11 +472,11 @@
                 d="M 48 155 C 75 145, 105 110, 135 95 S 170 85, 200 72 S 228 63, 240 58"/>
 
           <!-- Key data points on main line -->
-          <circle class="chart-dot" cx="115" cy="65" r="4.5" fill="#a78bfa"
+          <circle class="chart-dot" cx="115" cy="65" r="4.5" fill="#D94054"
                   filter="url(#glow)" style="transform-origin:115px 65px; animation-delay:1.4s"/>
-          <circle class="chart-dot" cx="180" cy="55" r="4.5" fill="#a78bfa"
+          <circle class="chart-dot" cx="180" cy="55" r="4.5" fill="#D94054"
                   filter="url(#glow)" style="transform-origin:180px 55px; animation-delay:1.6s"/>
-          <circle class="chart-dot" cx="240" cy="42" r="5"   fill="#c4b5fd"
+          <circle class="chart-dot" cx="240" cy="42" r="5"   fill="#E8909A"
                   filter="url(#glow)" style="transform-origin:240px 42px; animation-delay:1.9s"/>
 
           <!-- Axis tick labels -->
@@ -492,15 +490,15 @@
           <text x="20" y="55"  font-size="8" fill="#475569" text-anchor="end">1.0</text>
 
           <!-- X-axis label -->
-          <text x="140" y="198" font-size="9" fill="#7c3aed" text-anchor="middle" font-weight="600">Wavelength (nm)</text>
+          <text x="140" y="196" font-size="9" fill="#8B1A2B" text-anchor="middle" font-weight="600">Wavelength (nm)</text>
 
           <!-- Legend -->
-          <rect x="32" y="192" width="10" height="3" rx="1.5" fill="#a78bfa"/>
-          <text x="46" y="196" font-size="8" fill="#94a3b8">Sample A</text>
-          <rect x="102" y="192" width="10" height="3" rx="1.5" fill="#f9a8d4"/>
-          <text x="116" y="196" font-size="8" fill="#94a3b8">Sample B</text>
-          <rect x="172" y="192" width="10" height="3" rx="1.5" fill="#67e8f9"/>
-          <text x="186" y="196" font-size="8" fill="#94a3b8">Sample C</text>
+          <rect x="32" y="213" width="10" height="3" rx="1.5" fill="#D94054"/>
+          <text x="46" y="217" font-size="8" fill="#94a3b8">Sample A</text>
+          <rect x="102" y="213" width="10" height="3" rx="1.5" fill="#F0B429"/>
+          <text x="116" y="217" font-size="8" fill="#94a3b8">Sample B</text>
+          <rect x="172" y="213" width="10" height="3" rx="1.5" fill="#A8B8C8"/>
+          <text x="186" y="217" font-size="8" fill="#94a3b8">Sample C</text>
         </svg>
       </div>
 
@@ -704,20 +702,18 @@
   <div class="container--narrow">
     <h2 class="section__title">Quick installation</h2>
     <p class="section__subtitle">
-      Clone and run with the provided setup scripts, or install from PyPI for scripting.
+      Clone the repository and run with the provided setup scripts &mdash; no terminal
+      experience required.
     </p>
 
-    <div class="install-grid">
-      <div>
-        <div class="install-label">Clone &amp; launch GUI (recommended)</div>
-        <div class="code-block">
-          <div class="code-block__bar">
-            <span class="code-block__dot code-block__dot--red"></span>
-            <span class="code-block__dot code-block__dot--yellow"></span>
-            <span class="code-block__dot code-block__dot--green"></span>
-            <span class="code-block__label">bash</span>
-          </div>
-          <pre><code>git clone https://github.com/The-Schultz-Lab/plottle.git
+    <div class="code-block">
+      <div class="code-block__bar">
+        <span class="code-block__dot code-block__dot--red"></span>
+        <span class="code-block__dot code-block__dot--yellow"></span>
+        <span class="code-block__dot code-block__dot--green"></span>
+        <span class="code-block__label">bash</span>
+      </div>
+      <pre><code>git clone https://github.com/The-Schultz-Lab/plottle.git
 cd plottle
 
 <span class="c"># Windows — double-click setup.bat, then launch.bat</span>
@@ -729,35 +725,12 @@ source .venv/bin/activate  <span class="c"># macOS/Linux</span>
 <span class="c"># .venv\Scripts\activate  # Windows</span>
 pip install -r requirements.txt
 streamlit run modules/Home.py</code></pre>
-        </div>
-      </div>
+    </div>
 
-      <div>
-        <div class="install-label">PyPI (scripting / notebooks)</div>
-        <div class="code-block">
-          <div class="code-block__bar">
-            <span class="code-block__dot code-block__dot--red"></span>
-            <span class="code-block__dot code-block__dot--yellow"></span>
-            <span class="code-block__dot code-block__dot--green"></span>
-            <span class="code-block__label">bash</span>
-          </div>
-          <pre><code>pip install plottle
-
-<span class="c"># Optional extras:</span>
-<span class="c"># pip install plottle[docs]   # Sphinx docs</span>
-
-<span class="c"># Or launch via the CLI:</span>
-plottle plot data.csv \
-  --plot scatter \
-  --x-column x \
-  --y-column y</code></pre>
-        </div>
-        <div class="callout callout--info" style="margin-top:1rem;">
-          <strong>Try it instantly:</strong>
-          launch Plottle in your browser with no installation via
-          <a href="https://mybinder.org/v2/gh/The-Schultz-Lab/plottle/main" target="_blank" rel="noopener">Binder</a>.
-        </div>
-      </div>
+    <div class="callout callout--info" style="margin-top:1.25rem;">
+      <strong>Try it instantly:</strong>
+      launch Plottle in your browser with no installation via
+      <a href="https://mybinder.org/v2/gh/The-Schultz-Lab/plottle/main" target="_blank" rel="noopener">Binder</a>.
     </div>
 
   </div>
@@ -996,7 +969,6 @@ plottle convert spectrum.jdx spectrum.csv</code></pre>
       <nav class="footer__links" aria-label="Footer links">
         <a href="https://github.com/The-Schultz-Lab" target="_blank" rel="noopener">Schultz Lab</a>
         <a href="https://github.com/The-Schultz-Lab/plottle" target="_blank" rel="noopener">Repository</a>
-        <a href="https://pypi.org/project/plottle/" target="_blank" rel="noopener">PyPI</a>
         <a href="https://mybinder.org/v2/gh/The-Schultz-Lab/plottle/main" target="_blank" rel="noopener">Try on Binder</a>
         <a href="https://github.com/The-Schultz-Lab/plottle/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
       </nav>
