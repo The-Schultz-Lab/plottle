@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plottle — Scientific Data Visualization for Python</title>
+  <meta name="description" content="A general-purpose Python toolkit for scientific data visualization and analysis. 26 plot types, 14-page Streamlit GUI, 18 file formats, and a full Python API.">
+  <meta property="og:title" content="Plottle">
+  <meta property="og:description" content="Scientific data visualization for Python — Matplotlib, Seaborn, and Plotly behind one clean API and a point-and-click GUI.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#1a0c0e">
+  <style>
+    /* ── Reset & Base ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: Inter, 'Segoe UI', -apple-system, BlinkMacSystemFont,
+                   'Helvetica Neue', Arial, sans-serif;
+      background: #ffffff;
+      color: #334155;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; }
+    img, svg { display: block; max-width: 100%; }
+
+    /* ── Containers ─────────────────────────────────────────────────────── */
+    .container        { max-width: 1160px; margin: 0 auto; padding: 0 1.5rem; }
+    .container--narrow { max-width: 780px;  margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ── Navigation ─────────────────────────────────────────────────────── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav__inner {
+      display: flex; align-items: center; gap: 1.75rem;
+      padding: 0.9rem 1.5rem; max-width: 1160px; margin: 0 auto;
+    }
+    .nav__logo {
+      font-weight: 700; font-size: 1.0625rem; color: #f8fafc;
+      letter-spacing: -0.02em; margin-right: auto; text-decoration: none;
+    }
+    .nav__badge {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+      color: #94a3b8; text-transform: uppercase;
+    }
+    .nav__link {
+      font-size: 0.875rem; font-weight: 500; color: #94a3b8;
+      text-decoration: none; transition: color 0.15s;
+    }
+    .nav__link:hover { color: #e2e8f0; }
+    @media (max-width: 640px) { .nav__badge, .nav__link { display: none; } }
+
+    /* ── Buttons ────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.7rem 1.4rem; border-radius: 8px;
+      font-size: 0.9375rem; font-weight: 600;
+      text-decoration: none; border: 2px solid transparent;
+      transition: all 0.18s ease; cursor: pointer; white-space: nowrap;
+    }
+    .btn--primary {
+      background: #8B1A2B; color: #ffffff;
+      box-shadow: 0 1px 4px rgba(139,26,43,0.35);
+    }
+    .btn--primary:hover {
+      background: #7A1625;
+      box-shadow: 0 4px 18px rgba(139,26,43,0.55);
+      transform: translateY(-1px);
+    }
+    .btn--outline {
+      background: transparent; color: #f8fafc;
+      border-color: rgba(248,250,252,0.28);
+    }
+    .btn--outline:hover {
+      background: rgba(248,250,252,0.07);
+      border-color: rgba(248,250,252,0.55);
+    }
+    .btn--ghost {
+      background: transparent; color: #cbd5e1;
+      border-color: rgba(203,213,225,0.22);
+      padding: 0.45rem 0.95rem; font-size: 0.875rem;
+    }
+    .btn--ghost:hover { background: rgba(255,255,255,0.07); color: #f8fafc; }
+
+    /* ── Pills / Badges ─────────────────────────────────────────────────── */
+    .pill {
+      display: inline-flex; align-items: center;
+      padding: 0.25rem 0.8rem; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em;
+      background: rgba(139,26,43,0.15);
+      border: 1px solid rgba(139,26,43,0.35);
+      color: #f5b0b6;
+    }
+    .pill--pink {
+      background: rgba(197,160,40,0.15);
+      border-color: rgba(197,160,40,0.40);
+      color: #F0B429;
+    }
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 0.22rem 0.65rem; border-radius: 999px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .badge--full    { background: #d1fae5; color: #065f46; }
+    .badge--partial { background: #fef3c7; color: #92400e; }
+    .badge--pypi    { background: #ede9fe; color: #6B1527; }
+
+    /* ── Hero ───────────────────────────────────────────────────────────── */
+    .hero {
+      background:
+        radial-gradient(ellipse 75% 55% at 72% 42%, rgba(139,26,43,0.22) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 75% at 18% 62%, rgba(197,160,40,0.12) 0%, transparent 54%),
+        linear-gradient(158deg, #0f172a 0%, #1a0c0e 55%, #0f172a 100%);
+      padding: 5.5rem 0 5rem;
+      overflow: hidden;
+    }
+    .hero__inner {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 3.5rem;
+      align-items: center;
+    }
+    .hero__eyebrow { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .hero__title {
+      font-size: clamp(2.25rem, 5vw, 3.125rem);
+      font-weight: 800; line-height: 1.1; letter-spacing: -0.04em;
+      color: #f8fafc; margin-bottom: 1.25rem;
+    }
+    .hero__subtitle {
+      font-size: 1.125rem; color: #94a3b8; line-height: 1.65;
+      max-width: 520px; margin-bottom: 2rem;
+    }
+    .hero__actions { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .hero__meta { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+    .hero__stat { font-size: 0.8125rem; color: #64748b; font-weight: 500; }
+    .hero__sep  { color: #334155; }
+    .hero__visual { display: flex; justify-content: center; align-items: center; }
+    @media (max-width: 768px) {
+      .hero__inner { grid-template-columns: 1fr; }
+      .hero__visual { display: none; }
+    }
+
+    /* Animated chart SVG */
+    .chart-svg { width: 270px; height: 245px; }
+    .chart-line {
+      fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .chart-line--main { stroke: #D94054; stroke-dasharray: 320; stroke-dashoffset: 320; }
+    .chart-line--secondary { stroke: #F0B429; stroke-dasharray: 280; stroke-dashoffset: 280; }
+    .chart-line--tertiary { stroke: #A8B8C8; stroke-dasharray: 260; stroke-dashoffset: 260; }
+    @keyframes drawLine {
+      to { stroke-dashoffset: 0; }
+    }
+    .chart-line--main      { animation: drawLine 1.8s cubic-bezier(.4,0,.2,1) 0.2s forwards; }
+    .chart-line--secondary { animation: drawLine 1.8s cubic-bezier(.4,0,.2,1) 0.6s forwards; }
+    .chart-line--tertiary  { animation: drawLine 1.8s cubic-bezier(.4,0,.2,1) 1.0s forwards; }
+    .chart-dot { animation: popIn 0.4s cubic-bezier(.34,1.56,.64,1) both; }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .chart-line { animation: none; stroke-dashoffset: 0; }
+      .chart-dot  { animation: none; }
+    }
+
+    /* ── Sections ───────────────────────────────────────────────────────── */
+    .section { padding: 5rem 0; background: #ffffff; }
+    .section--tinted {
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .section__title {
+      font-size: clamp(1.5rem, 3vw, 1.875rem);
+      font-weight: 700; color: #0f172a;
+      text-align: center; margin-bottom: 0.6rem;
+      letter-spacing: -0.025em;
+    }
+    .section__subtitle {
+      font-size: 1.0625rem; color: #64748b;
+      text-align: center; max-width: 540px;
+      margin: 0 auto 3rem; line-height: 1.65;
+    }
+    .section__note {
+      font-size: 0.875rem; color: #94a3b8;
+      text-align: center; margin-top: 1rem;
+    }
+
+    /* ── Feature Cards ──────────────────────────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+    @media (max-width: 900px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .features-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: #ffffff;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      padding: 1.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.07);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0,0,0,.07), 0 14px 36px rgba(139,26,43,.15);
+    }
+    .feature-card__icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 1.1rem;
+      background: linear-gradient(135deg, rgba(139,26,43,0.10), rgba(197,160,40,0.08));
+      border: 1px solid rgba(139,26,43,0.12);
+    }
+    .feature-card__title {
+      font-size: 1.0625rem; font-weight: 700;
+      color: #0f172a; margin-bottom: 0.5rem;
+      letter-spacing: -0.015em;
+    }
+    .feature-card__body { font-size: 0.9375rem; color: #475569; line-height: 1.65; }
+
+    /* ── Count cards (stat strip) ───────────────────────────────────────── */
+    .stat-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem; margin-bottom: 3.5rem;
+    }
+    @media (max-width: 720px) { .stat-strip { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 400px) { .stat-strip { grid-template-columns: 1fr; } }
+    .stat-card {
+      text-align: center; padding: 1.5rem 1rem;
+      background: linear-gradient(135deg, rgba(139,26,43,0.05), rgba(197,160,40,0.04));
+      border: 1px solid rgba(139,26,43,0.12);
+      border-radius: 14px;
+    }
+    .stat-card__num {
+      font-size: 2.25rem; font-weight: 800; color: #8B1A2B;
+      letter-spacing: -0.04em; line-height: 1;
+    }
+    .stat-card__label { font-size: 0.8125rem; color: #64748b; margin-top: 0.35rem; font-weight: 500; }
+
+    /* ── Data Tables ────────────────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; border-radius: 14px; }
+    .data-table {
+      width: 100%; border-collapse: collapse;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 14px rgba(0,0,0,.07);
+      border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden;
+    }
+    .data-table thead { background: #f1f5f9; }
+    .data-table th {
+      padding: 0.875rem 1.25rem; text-align: left;
+      font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em; color: #64748b;
+    }
+    .data-table td {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid #f1f5f9;
+      font-size: 0.9375rem; color: #334155; vertical-align: top;
+    }
+    .data-table tbody tr:hover { background: #f8fafc; }
+    .data-table code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.8125rem; background: #f1f5f9;
+      border: 1px solid #e2e8f0; border-radius: 4px;
+      padding: 0.15rem 0.45rem; color: #0f172a;
+    }
+    .td-num {
+      font-weight: 700; color: #94a3b8;
+      font-size: 0.8125rem; white-space: nowrap;
+    }
+    .td-muted { font-size: 0.875rem; color: #64748b; margin-top: 0.2rem; }
+
+    /* ── Code Block ─────────────────────────────────────────────────────── */
+    .code-block {
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .code-block__bar {
+      background: #1c2333; padding: 0.65rem 1rem;
+      display: flex; align-items: center; gap: 0.45rem;
+    }
+    .code-block__dot { width: 12px; height: 12px; border-radius: 50%; }
+    .code-block__dot--red    { background: #ff5f57; }
+    .code-block__dot--yellow { background: #febc2e; }
+    .code-block__dot--green  { background: #28c840; }
+    .code-block__label {
+      margin-left: auto; font-size: 0.6875rem;
+      color: #6b7280; font-family: monospace; letter-spacing: 0.05em;
+    }
+    .code-block pre {
+      background: #0d1117; padding: 1.6rem 1.5rem;
+      margin: 0; overflow-x: auto;
+    }
+    .code-block code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', 'Monaco', monospace;
+      font-size: 0.875rem; line-height: 1.75; color: #e6edf3;
+      background: none; border: none; padding: 0;
+    }
+    .c { color: #8b949e; }   /* comment */
+    .k { color: #ff7b72; }   /* keyword */
+    .s { color: #a5d6ff; }   /* string */
+    .p { color: #C5A028; }   /* prompt / special / purple */
+    .n { color: #79c0ff; }   /* name / blue */
+
+    /* ── Callout ────────────────────────────────────────────────────────── */
+    .callout {
+      margin-top: 1.5rem; padding: 1.1rem 1.25rem;
+      border-radius: 10px; border-left: 4px solid;
+      font-size: 0.9375rem; line-height: 1.65;
+    }
+    .callout--info { background: #fdf4f5; border-color: #8B1A2B; color: #3d0a10; }
+    .callout a { color: #7A1625; font-weight: 600; }
+
+    /* ── Two-col install layout ─────────────────────────────────────────── */
+    .install-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 720px) { .install-grid { grid-template-columns: 1fr; } }
+    .install-label {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: #94a3b8; margin-bottom: 0.75rem;
+    }
+
+    /* ── Plot type pills ────────────────────────────────────────────────── */
+    .type-cloud {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+      margin-top: 1.75rem; justify-content: center;
+    }
+    .type-pill {
+      padding: 0.35rem 0.9rem; border-radius: 999px;
+      background: #fdf4f5; border: 1px solid #f0bec2;
+      color: #6B1527; font-size: 0.8125rem; font-weight: 600;
+    }
+
+    /* ── Format category chips ──────────────────────────────────────────── */
+    .format-group { margin-bottom: 1.25rem; }
+    .format-group__label {
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: #94a3b8; margin-bottom: 0.5rem;
+    }
+    .format-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .chip {
+      padding: 0.25rem 0.7rem; border-radius: 6px;
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.78125rem; font-weight: 600;
+      background: #f1f5f9; border: 1px solid #e2e8f0; color: #334155;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────────────── */
+    .footer {
+      background: #0f172a;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 2.75rem 0;
+    }
+    .footer__inner {
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 1.25rem;
+    }
+    .footer__name { font-weight: 700; color: #f8fafc; font-size: 1.0625rem; letter-spacing: -0.02em; }
+    .footer__copy { display: block; font-size: 0.8rem; color: #64748b; margin-top: 0.3rem; }
+    .footer__links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .footer__links a {
+      color: #94a3b8; text-decoration: none;
+      font-size: 0.875rem; transition: color 0.15s;
+    }
+    .footer__links a:hover { color: #e2e8f0; }
+  </style>
+</head>
+<body>
+
+<!-- ── Navigation ──────────────────────────────────────────────────────── -->
+<nav class="nav" role="navigation">
+  <div class="nav__inner">
+    <a class="nav__logo" href="#">Plottle</a>
+    <span class="nav__badge">v2.0.1 &middot; MIT</span>
+    <a class="nav__link" href="#features">Features</a>
+    <a class="nav__link" href="#install">Install</a>
+    <a class="nav__link" href="#api">API</a>
+    <a class="nav__link" href="#gui">GUI</a>
+    <a class="btn btn--ghost" href="https://github.com/The-Schultz-Lab/plottle">GitHub &rarr;</a>
+  </div>
+</nav>
+
+<!-- ── Hero ────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero__inner">
+
+      <div class="hero__text">
+        <div class="hero__eyebrow">
+          <span class="pill">Schultz Lab &middot; NCCU</span>
+          <span class="pill pill--pink">26 plot types</span>
+        </div>
+        <h1 class="hero__title">Scientific data<br>visualization,<br>simplified</h1>
+        <p class="hero__subtitle">
+          Matplotlib, Seaborn, and Plotly &mdash; unified behind one clean API and
+          a 14-page point-and-click Streamlit GUI. From raw files to publication
+          figures in minutes.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="https://github.com/The-Schultz-Lab/plottle">
+            View on GitHub
+          </a>
+          <a class="btn btn--outline" href="#install">Get started</a>
+        </div>
+        <div class="hero__meta">
+          <span class="hero__stat">Python 3.9&ndash;3.12</span>
+          <span class="hero__sep">&middot;</span>
+          <span class="hero__stat">900+ tests</span>
+          <span class="hero__sep">&middot;</span>
+          <span class="hero__stat">MIT License</span>
+        </div>
+      </div>
+
+      <!-- Animated line chart -->
+      <div class="hero__visual" aria-hidden="true">
+        <svg class="chart-svg" viewBox="0 0 270 245" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Chart frame -->
+          <rect x="22" y="14" width="232" height="170" rx="8"
+                fill="rgba(15,23,42,0.55)" stroke="rgba(139,26,43,0.28)" stroke-width="1"/>
+
+          <!-- Grid lines (horizontal) -->
+          <line x1="30" y1="55"  x2="246" y2="55"  stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <line x1="30" y1="97"  x2="246" y2="97"  stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <line x1="30" y1="139" x2="246" y2="139" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+          <!-- Y-axis -->
+          <line x1="38" y1="22" x2="38" y2="176" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <!-- X-axis -->
+          <line x1="38" y1="176" x2="246" y2="176" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+
+          <!-- Area fill under main line (gradient) -->
+          <defs>
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8B1A2B" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#8B1A2B" stop-opacity="0.02"/>
+            </linearGradient>
+          </defs>
+          <path d="M 48 148 C 70 130, 90 80, 115 65 S 155 90, 180 55 S 215 70, 240 42 L 240 176 L 48 176 Z"
+                fill="url(#areaGrad)" opacity="0.7"/>
+
+          <!-- Main line (violet) -->
+          <path class="chart-line chart-line--main"
+                d="M 48 148 C 70 130, 90 80, 115 65 S 155 90, 180 55 S 215 70, 240 42"
+                filter="url(#glow)"/>
+
+          <!-- Secondary line (pink) -->
+          <path class="chart-line chart-line--secondary"
+                d="M 48 162 C 78 158, 100 145, 130 132 S 165 118, 195 108 S 225 100, 240 88"/>
+
+          <!-- Tertiary line (cyan) -->
+          <path class="chart-line chart-line--tertiary"
+                d="M 48 155 C 75 145, 105 110, 135 95 S 170 85, 200 72 S 228 63, 240 58"/>
+
+          <!-- Key data points on main line -->
+          <circle class="chart-dot" cx="115" cy="65" r="4.5" fill="#D94054"
+                  filter="url(#glow)" style="transform-origin:115px 65px; animation-delay:1.4s"/>
+          <circle class="chart-dot" cx="180" cy="55" r="4.5" fill="#D94054"
+                  filter="url(#glow)" style="transform-origin:180px 55px; animation-delay:1.6s"/>
+          <circle class="chart-dot" cx="240" cy="42" r="5"   fill="#E8909A"
+                  filter="url(#glow)" style="transform-origin:240px 42px; animation-delay:1.9s"/>
+
+          <!-- Axis tick labels -->
+          <text x="36" y="180" font-size="8" fill="#475569" text-anchor="middle">0</text>
+          <text x="90" y="180" font-size="8" fill="#475569" text-anchor="middle">200</text>
+          <text x="140" y="180" font-size="8" fill="#475569" text-anchor="middle">400</text>
+          <text x="190" y="180" font-size="8" fill="#475569" text-anchor="middle">600</text>
+          <text x="240" y="180" font-size="8" fill="#475569" text-anchor="middle">800</text>
+          <text x="20" y="148" font-size="8" fill="#475569" text-anchor="end">0.2</text>
+          <text x="20" y="97"  font-size="8" fill="#475569" text-anchor="end">0.6</text>
+          <text x="20" y="55"  font-size="8" fill="#475569" text-anchor="end">1.0</text>
+
+          <!-- X-axis label -->
+          <text x="140" y="196" font-size="9" fill="#8B1A2B" text-anchor="middle" font-weight="600">Wavelength (nm)</text>
+
+          <!-- Legend -->
+          <rect x="32" y="213" width="10" height="3" rx="1.5" fill="#D94054"/>
+          <text x="46" y="217" font-size="8" fill="#94a3b8">Sample A</text>
+          <rect x="102" y="213" width="10" height="3" rx="1.5" fill="#F0B429"/>
+          <text x="116" y="217" font-size="8" fill="#94a3b8">Sample B</text>
+          <rect x="172" y="213" width="10" height="3" rx="1.5" fill="#A8B8C8"/>
+          <text x="186" y="217" font-size="8" fill="#94a3b8">Sample C</text>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── At-a-glance stats ─────────────────────────────────────────────────── -->
+<section class="section" style="padding-bottom: 0;">
+  <div class="container">
+    <div class="stat-strip">
+      <div class="stat-card">
+        <div class="stat-card__num">26</div>
+        <div class="stat-card__label">Plot types</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__num">18</div>
+        <div class="stat-card__label">File formats</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__num">14</div>
+        <div class="stat-card__label">GUI pages</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__num">900<span style="font-size:1.25rem">+</span></div>
+        <div class="stat-card__label">Tests</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Features ─────────────────────────────────────────────────────────── -->
+<section class="section" id="features">
+  <div class="container">
+    <h2 class="section__title">Everything in one toolkit</h2>
+    <p class="section__subtitle">
+      From raw data upload to publication figures &mdash; without switching tools
+      or writing boilerplate.
+    </p>
+    <div class="features-grid">
+
+      <div class="card">
+        <div class="feature-card__icon">📊</div>
+        <div class="feature-card__title">26 Plot Types</div>
+        <p class="feature-card__body">
+          Scatter, line, bar, histogram, box, violin, heatmap, contour, 3D surface,
+          regression, and more &mdash; in Matplotlib, Seaborn, or interactive Plotly.
+          Annotation overlays included.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="feature-card__icon">🖱️</div>
+        <div class="feature-card__title">14-Page Streamlit GUI</div>
+        <p class="feature-card__body">
+          Data upload, quick plotting, analysis tools, multi-plot dashboards,
+          spectroscopy, molecular visualization, batch analysis, and export &mdash;
+          all point-and-click, no code required.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="feature-card__icon">📁</div>
+        <div class="feature-card__title">18 File Formats</div>
+        <p class="feature-card__body">
+          CSV, Excel, TSV, JSON, Parquet, NumPy, Pickle, JCAMP-DX, HDF5, NetCDF,
+          SPC, ASC, mzML/mzXML, and more. Auto-detected from file extension via a
+          single <code style="font-size:.78rem;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:.1rem .35rem">load_data()</code> call.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="feature-card__icon">🧮</div>
+        <div class="feature-card__title">Analysis Tools</div>
+        <p class="feature-card__body">
+          25+ math functions covering statistics, curve fitting (Gaussian, Lorentzian,
+          Voigt), signal processing (FFT, smoothing, baseline), peak finding, and
+          hypothesis testing.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="feature-card__icon">🔬</div>
+        <div class="feature-card__title">Spectroscopy Module</div>
+        <p class="feature-card__body">
+          Dedicated tools for IR/Raman, NMR, UV-Vis, and mass spectrometry.
+          Built-in NIST WebBook integration fetches reference spectra by CAS number.
+          3D molecular visualization from Gaussian/ORCA output files.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="feature-card__icon">🔌</div>
+        <div class="feature-card__title">Plugin System</div>
+        <p class="feature-card__body">
+          Drop a <code style="font-size:.78rem;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:.1rem .35rem">plugin_*.py</code>
+          file into <code style="font-size:.78rem;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:.1rem .35rem">plugins/</code>
+          to add custom plot types or analysis tools. Discovered and loaded
+          automatically at startup.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Plot types ─────────────────────────────────────────────────────────── -->
+<section class="section section--tinted">
+  <div class="container--narrow">
+    <h2 class="section__title">Plot types at a glance</h2>
+    <p class="section__subtitle">
+      Static, statistical, and interactive &mdash; pick the library that fits your workflow.
+    </p>
+    <div class="type-cloud">
+      <span class="type-pill">Scatter</span>
+      <span class="type-pill">Line</span>
+      <span class="type-pill">Bar</span>
+      <span class="type-pill">Histogram</span>
+      <span class="type-pill">Box</span>
+      <span class="type-pill">Violin</span>
+      <span class="type-pill">Heatmap</span>
+      <span class="type-pill">Contour</span>
+      <span class="type-pill">3D Surface</span>
+      <span class="type-pill">Regression</span>
+      <span class="type-pill">Distribution</span>
+      <span class="type-pill">Pair Plot</span>
+      <span class="type-pill">Strip / Swarm</span>
+      <span class="type-pill">Error Bars</span>
+      <span class="type-pill">Stem</span>
+      <span class="type-pill">Step</span>
+      <span class="type-pill">Area</span>
+      <span class="type-pill">Pie / Donut</span>
+      <span class="type-pill">Polar</span>
+      <span class="type-pill">Radar</span>
+      <span class="type-pill">Interactive Scatter</span>
+      <span class="type-pill">Interactive Line</span>
+      <span class="type-pill">Interactive Heatmap</span>
+      <span class="type-pill">Interactive Histogram</span>
+      <span class="type-pill">Interactive 3D</span>
+      <span class="type-pill">Spectral</span>
+    </div>
+    <p class="section__note">
+      Matplotlib &rarr; static/print &nbsp;&middot;&nbsp;
+      Seaborn &rarr; statistical &nbsp;&middot;&nbsp;
+      Plotly &rarr; interactive/web
+    </p>
+  </div>
+</section>
+
+<!-- ── File formats ───────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container--narrow">
+    <h2 class="section__title">Supported file formats</h2>
+    <p class="section__subtitle">
+      One function reads them all. Format is detected from the file extension automatically.
+    </p>
+
+    <div class="format-group">
+      <div class="format-group__label">Tabular</div>
+      <div class="format-chips">
+        <span class="chip">.csv</span>
+        <span class="chip">.tsv</span>
+        <span class="chip">.xlsx / .xls</span>
+        <span class="chip">.json</span>
+        <span class="chip">.parquet</span>
+      </div>
+    </div>
+
+    <div class="format-group">
+      <div class="format-group__label">Array / Serialized</div>
+      <div class="format-chips">
+        <span class="chip">.npy</span>
+        <span class="chip">.npz</span>
+        <span class="chip">.pkl</span>
+      </div>
+    </div>
+
+    <div class="format-group">
+      <div class="format-group__label">Instrument / Spectral</div>
+      <div class="format-chips">
+        <span class="chip">.jdx / .dx</span>
+        <span class="chip">.h5 / .hdf5</span>
+        <span class="chip">.nc / .cdf</span>
+        <span class="chip">.spc</span>
+        <span class="chip">.asc</span>
+        <span class="chip">.mzml</span>
+        <span class="chip">.mzxml</span>
+      </div>
+    </div>
+
+    <div class="callout callout--info">
+      <strong>Instrument data:</strong> JCAMP-DX (.jdx/.dx) handles IR and Raman spectra
+      from most benchtop instruments. HDF5 and NetCDF cover large array datasets from
+      simulations or time-series experiments. SPC files work with Thermo Fisher instruments.
+    </div>
+  </div>
+</section>
+
+<!-- ── Installation ──────────────────────────────────────────────────────── -->
+<section class="section section--tinted" id="install">
+  <div class="container--narrow">
+    <h2 class="section__title">Quick installation</h2>
+    <p class="section__subtitle">
+      Clone the repository and run with the provided setup scripts &mdash; no terminal
+      experience required.
+    </p>
+
+    <div class="code-block">
+      <div class="code-block__bar">
+        <span class="code-block__dot code-block__dot--red"></span>
+        <span class="code-block__dot code-block__dot--yellow"></span>
+        <span class="code-block__dot code-block__dot--green"></span>
+        <span class="code-block__label">bash</span>
+      </div>
+      <pre><code>git clone https://github.com/The-Schultz-Lab/plottle.git
+cd plottle
+
+<span class="c"># Windows — double-click setup.bat, then launch.bat</span>
+<span class="c"># macOS   — double-click setup.command, then launch.command</span>
+
+<span class="c"># Or from the terminal:</span>
+python -m venv .venv
+source .venv/bin/activate  <span class="c"># macOS/Linux</span>
+<span class="c"># .venv\Scripts\activate  # Windows</span>
+pip install -r requirements.txt
+streamlit run modules/Home.py</code></pre>
+    </div>
+
+    <div class="callout callout--info" style="margin-top:1.25rem;">
+      <strong>Try it instantly:</strong>
+      launch Plottle in your browser with no installation via
+      <a href="https://mybinder.org/v2/gh/The-Schultz-Lab/plottle/main" target="_blank" rel="noopener">Binder</a>.
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Python API ─────────────────────────────────────────────────────────── -->
+<section class="section" id="api">
+  <div class="container--narrow">
+    <h2 class="section__title">Python API</h2>
+    <p class="section__subtitle">
+      Use Plottle from scripts or Jupyter notebooks for reproducible, programmatic analysis.
+    </p>
+
+    <div class="code-block">
+      <div class="code-block__bar">
+        <span class="code-block__dot code-block__dot--red"></span>
+        <span class="code-block__dot code-block__dot--yellow"></span>
+        <span class="code-block__dot code-block__dot--green"></span>
+        <span class="code-block__label">python</span>
+      </div>
+      <pre><code><span class="k">from</span> plottle.io <span class="k">import</span> load_data
+<span class="k">from</span> plottle.plotting <span class="k">import</span> line_plot, save_figure
+<span class="k">import</span> numpy <span class="k">as</span> np
+
+<span class="c"># Simulate a UV-Vis absorption spectrum</span>
+wavelength  = np.linspace(<span class="n">400</span>, <span class="n">800</span>, <span class="n">200</span>)
+absorbance  = <span class="n">0.8</span> * np.exp(-((wavelength - <span class="n">520</span>) ** <span class="n">2</span>) / (<span class="n">2</span> * <span class="n">30</span> ** <span class="n">2</span>))
+
+<span class="c"># Plot — returns (fig, ax, info) for Matplotlib plots</span>
+fig, ax, info = line_plot(
+    wavelength, [absorbance],
+    xlabel=<span class="s">'Wavelength (nm)'</span>,
+    ylabel=<span class="s">'Absorbance'</span>,
+    title=<span class="s">'UV-Vis Spectrum'</span>,
+    labels=[<span class="s">'Sample A'</span>],
+)
+save_figure(fig, <span class="s">'spectrum.png'</span>, dpi=<span class="n">300</span>)
+
+<span class="c"># Load any of the 18 supported formats automatically</span>
+df = load_data(<span class="s">'experiment.jdx'</span>)   <span class="c"># JCAMP-DX</span>
+df = load_data(<span class="s">'data.hdf5'</span>)        <span class="c"># HDF5</span>
+df = load_data(<span class="s">'results.csv'</span>)      <span class="c"># CSV</span></code></pre>
+    </div>
+
+    <div class="table-wrap" style="margin-top: 2.5rem;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Module</th>
+            <th>What it provides</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>plottle.io</code></td>
+            <td><code>load_data()</code> / <code>save_data()</code> &mdash; auto-detects format from extension</td>
+          </tr>
+          <tr>
+            <td><code>plottle.plotting</code></td>
+            <td>26 plot functions; Matplotlib returns <code>(fig, ax, info)</code>, Plotly returns <code>(fig, info)</code></td>
+          </tr>
+          <tr>
+            <td><code>plottle.math</code></td>
+            <td>25 functions &mdash; statistics, curve fitting, hypothesis tests, optimization, linear algebra</td>
+          </tr>
+          <tr>
+            <td><code>plottle.signal</code></td>
+            <td>16 functions &mdash; smoothing, filtering, FFT, derivatives, baseline correction, interpolation</td>
+          </tr>
+          <tr>
+            <td><code>plottle.peaks</code></td>
+            <td>Find, integrate, FWHM, fit (Gaussian / Lorentzian / Voigt / pseudo-Voigt)</td>
+          </tr>
+          <tr>
+            <td><code>plottle.spectroscopy</code></td>
+            <td>18 functions &mdash; IR/Raman, UV-Vis, NMR, mass spectrometry</td>
+          </tr>
+          <tr>
+            <td><code>plottle.nist</code></td>
+            <td>NIST WebBook integration &mdash; fetch IR spectra by CAS number</td>
+          </tr>
+          <tr>
+            <td><code>plottle.data_tools</code></td>
+            <td>12 non-destructive DataFrame operations (normalize, pivot, merge, resample, &hellip;)</td>
+          </tr>
+          <tr>
+            <td><code>plottle.annotations</code></td>
+            <td>7 overlay types &mdash; hline, vline, span, text, rectangle, ellipse</td>
+          </tr>
+          <tr>
+            <td><code>plottle.report</code></td>
+            <td>PDF report generation via <code>matplotlib.PdfPages</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── GUI Pages ──────────────────────────────────────────────────────────── -->
+<section class="section section--tinted" id="gui">
+  <div class="container--narrow">
+    <h2 class="section__title">14-page Streamlit GUI</h2>
+    <p class="section__subtitle">
+      A full exploratory data analysis environment in the browser &mdash;
+      no coding required.
+    </p>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Page</th>
+            <th>What you can do</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-num">Home</td>
+            <td><strong>Dashboard</strong></td>
+            <td>Overview, help tabs, recent sessions</td>
+          </tr>
+          <tr>
+            <td class="td-num">1</td>
+            <td><strong>Data Upload</strong></td>
+            <td>18 formats, shape/type preview, batch folder import</td>
+          </tr>
+          <tr>
+            <td class="td-num">2</td>
+            <td><strong>Quick Plot</strong></td>
+            <td>26 plot types, live style controls, annotation panel, Plotly toggle</td>
+          </tr>
+          <tr>
+            <td class="td-num">3</td>
+            <td><strong>Analysis Tools</strong></td>
+            <td>8 tabs: Statistics, Distribution, Curve Fit, Optimization, Linear Algebra, Signal, Peaks, Hypothesis Tests</td>
+          </tr>
+          <tr>
+            <td class="td-num">4</td>
+            <td><strong>Multi-Plot Dashboard</strong></td>
+            <td>Up to 4&times;4 grid, axis sharing, combined PNG/PDF export</td>
+          </tr>
+          <tr>
+            <td class="td-num">5</td>
+            <td><strong>Advanced Plotting</strong></td>
+            <td>Seaborn statistical plots and Plotly interactive charts with HTML export</td>
+          </tr>
+          <tr>
+            <td class="td-num">7</td>
+            <td><strong>Export Results</strong></td>
+            <td>Plots, data, and analyses; save/load full sessions; PDF reports</td>
+          </tr>
+          <tr>
+            <td class="td-num">8</td>
+            <td><strong>Gallery</strong></td>
+            <td>Pre-generated figure gallery with <em>Load this config</em> buttons</td>
+          </tr>
+          <tr>
+            <td class="td-num">9</td>
+            <td><strong>Data Tools</strong></td>
+            <td>10 tabs: formula columns, normalize, transpose, pivot/melt, filter, merge, resample, rolling&hellip;</td>
+          </tr>
+          <tr>
+            <td class="td-num">10</td>
+            <td><strong>Spectroscopy</strong></td>
+            <td>IR/Raman, NMR, UV-Vis, MS tools; NIST WebBook lookup by CAS number</td>
+          </tr>
+          <tr>
+            <td class="td-num">11</td>
+            <td><strong>Molecular Viz</strong></td>
+            <td>Gaussian/ORCA/Molden output files; 3D structure and vibrational mode display</td>
+          </tr>
+          <tr>
+            <td class="td-num">12</td>
+            <td><strong>Batch Analysis</strong></td>
+            <td>Batch statistics, curve fitting, and peak analysis with workflow presets</td>
+          </tr>
+          <tr>
+            <td class="td-num">13</td>
+            <td><strong>Help</strong></td>
+            <td>Getting Started, Plot Types, Analysis Tools, Formats, Tips</td>
+          </tr>
+          <tr>
+            <td class="td-num">14</td>
+            <td><strong>Settings</strong></td>
+            <td>Theme, DPI, plot defaults, named preset CRUD, plugin status</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── CLI ────────────────────────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container--narrow">
+    <h2 class="section__title">Command-line interface</h2>
+    <p class="section__subtitle">
+      Five subcommands for batch processing and scripted workflows.
+    </p>
+    <div class="code-block">
+      <div class="code-block__bar">
+        <span class="code-block__dot code-block__dot--red"></span>
+        <span class="code-block__dot code-block__dot--yellow"></span>
+        <span class="code-block__dot code-block__dot--green"></span>
+        <span class="code-block__label">bash</span>
+      </div>
+      <pre><code><span class="c"># Generate a scatter plot from any supported file format</span>
+plottle plot data.csv --plot scatter --x-column x --y-column y
+
+<span class="c"># Descriptive statistics summary</span>
+plottle stats data.csv
+
+<span class="c"># Batch processing from a JSON config</span>
+plottle batch config.json --verbose
+
+<span class="c"># Side-by-side comparison of two datasets</span>
+plottle compare before.csv after.csv --plot line --output comparison.png
+
+<span class="c"># Convert between supported formats</span>
+plottle convert spectrum.jdx spectrum.csv</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div>
+        <div class="footer__name">Plottle</div>
+        <span class="footer__copy">
+          MIT License &middot; Copyright 2026 The Schultz Lab, North Carolina Central University
+        </span>
+      </div>
+      <nav class="footer__links" aria-label="Footer links">
+        <a href="https://github.com/The-Schultz-Lab" target="_blank" rel="noopener">Schultz Lab</a>
+        <a href="https://github.com/The-Schultz-Lab/plottle" target="_blank" rel="noopener">Repository</a>
+        <a href="https://mybinder.org/v2/gh/The-Schultz-Lab/plottle/main" target="_blank" rel="noopener">Try on Binder</a>
+        <a href="https://github.com/The-Schultz-Lab/plottle/blob/main/LICENSE" target="_blank" rel="noopener">License</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
