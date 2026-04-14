@@ -1,0 +1,22 @@
+# Plottle — Dash frontend requirements
+# Install with: pip install -r requirements_dash.txt
+#
+# These are IN ADDITION to the base requirements in requirements.txt.
+# Install both:
+#   pip install -r requirements.txt
+#   pip install -r requirements_dash.txt
+
+# Core Dash framework
+dash>=2.14.0
+dash-bootstrap-components>=1.5.0
+
+# Required by Plottle base (already in requirements.txt but listed for clarity)
+numpy>=1.24.0
+scipy>=1.10.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0
+
+# Dash dev/debug (optional)
+# dash[dev]
