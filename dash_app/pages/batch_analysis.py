@@ -9,7 +9,6 @@ from pathlib import Path
 
 import dash
 import dash_bootstrap_components as dbc
-import numpy as np
 import pandas as pd
 from dash import Input, Output, State, callback, dash_table, dcc, html
 
@@ -24,7 +23,9 @@ from plottle.utils.user_settings import (
     save_preset,
 )
 
-dash.register_page(__name__, path="/analyze-batch", title="Batch Analysis — Plottle", name="Batch Analysis")
+dash.register_page(
+    __name__, path="/analyze-batch", title="Batch Analysis — Plottle", name="Batch Analysis"
+)
 
 
 def layout(**kwargs):
@@ -36,7 +37,10 @@ def layout(**kwargs):
             html.Div(
                 [
                     html.H1("Batch Analysis", className="page-title"),
-                    html.P("Run analysis operations across multiple datasets simultaneously.", className="page-caption"),
+                    html.P(
+                        "Run analysis operations across multiple datasets simultaneously.",
+                        className="page-caption",
+                    ),
                 ],
                 className="page-header",
             ),
@@ -44,8 +48,13 @@ def layout(**kwargs):
                 dbc.Col(
                     [
                         dbc.Label("Datasets to analyze"),
-                        dcc.Dropdown(id="ba-datasets", options=ds_opts, value=names[:],
-                                     multi=True, placeholder="Select datasets…"),
+                        dcc.Dropdown(
+                            id="ba-datasets",
+                            options=ds_opts,
+                            value=names[:],
+                            multi=True,
+                            placeholder="Select datasets…",
+                        ),
                     ],
                     width=8,
                 ),
@@ -81,22 +90,29 @@ def render_tab(tab):
 
 # ── Statistics tab ────────────────────────────────────────────────────────────
 
+
 def _stats_tab():
     return html.Div(
         [
-            html.P("Compute descriptive statistics for a shared column across all selected datasets.",
-                   className="text-muted-sm mb-3"),
+            html.P(
+                "Compute descriptive statistics for a shared column across all selected datasets.",
+                className="text-muted-sm mb-3",
+            ),
             dbc.Row(
                 [
                     dbc.Col(
-                        [dbc.Label("Column name (must exist in all selected datasets)"),
-                         dbc.Input(id="ba-stats-col", placeholder="e.g. temperature", size="sm")],
+                        [
+                            dbc.Label("Column name (must exist in all selected datasets)"),
+                            dbc.Input(id="ba-stats-col", placeholder="e.g. temperature", size="sm"),
+                        ],
                         width=4,
                     ),
                 ],
                 className="mb-3",
             ),
-            dbc.Button("Run Batch Statistics", id="ba-stats-btn", color="primary", className="mb-3"),
+            dbc.Button(
+                "Run Batch Statistics", id="ba-stats-btn", color="primary", className="mb-3"
+            ),
             html.Div(id="ba-stats-output"),
         ]
     )
@@ -127,20 +143,43 @@ def run_batch_stats(n, dataset_names, col):
 
 # ── Curve Fitting tab ─────────────────────────────────────────────────────────
 
+
 def _fit_tab():
     return html.Div(
         [
-            html.P("Fit a model to a shared X/Y column pair across all selected datasets.", className="text-muted-sm mb-3"),
+            html.P(
+                "Fit a model to a shared X/Y column pair across all selected datasets.",
+                className="text-muted-sm mb-3",
+            ),
             dbc.Row(
                 [
-                    dbc.Col([dbc.Label("X column"), dbc.Input(id="ba-fit-x", placeholder="time", size="sm")], width=3),
-                    dbc.Col([dbc.Label("Y column"), dbc.Input(id="ba-fit-y", placeholder="concentration", size="sm")], width=3),
                     dbc.Col(
-                        [dbc.Label("Fit type"),
-                         dcc.Dropdown(id="ba-fit-type",
-                                      options=[{"label": t, "value": t}
-                                               for t in ["linear", "polynomial", "exponential"]],
-                                      value="linear", clearable=False)],
+                        [
+                            dbc.Label("X column"),
+                            dbc.Input(id="ba-fit-x", placeholder="time", size="sm"),
+                        ],
+                        width=3,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Label("Y column"),
+                            dbc.Input(id="ba-fit-y", placeholder="concentration", size="sm"),
+                        ],
+                        width=3,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Label("Fit type"),
+                            dcc.Dropdown(
+                                id="ba-fit-type",
+                                options=[
+                                    {"label": t, "value": t}
+                                    for t in ["linear", "polynomial", "exponential"]
+                                ],
+                                value="linear",
+                                clearable=False,
+                            ),
+                        ],
                         width=3,
                     ),
                 ],
@@ -167,8 +206,9 @@ def run_batch_fit(n, dataset_names, xcol, ycol, fit_type):
     datasets = {nm: state.get_dataset(nm) for nm in dataset_names}
     datasets = {nm: d for nm, d in datasets.items() if d is not None}
     try:
-        result = batch_curve_fit(datasets, x_column=xcol or None, y_column=ycol or None,
-                                 fit_type=fit_type)
+        result = batch_curve_fit(
+            datasets, x_column=xcol or None, y_column=ycol or None, fit_type=fit_type
+        )
         if isinstance(result, pd.DataFrame):
             return _df_table(result)
         return html.Pre(str(result), className="result-box")
@@ -178,19 +218,43 @@ def run_batch_fit(n, dataset_names, xcol, ycol, fit_type):
 
 # ── Peak Analysis tab ─────────────────────────────────────────────────────────
 
+
 def _peaks_tab():
     return html.Div(
         [
-            html.P("Detect peaks in a shared column across all selected datasets.", className="text-muted-sm mb-3"),
+            html.P(
+                "Detect peaks in a shared column across all selected datasets.",
+                className="text-muted-sm mb-3",
+            ),
             dbc.Row(
                 [
-                    dbc.Col([dbc.Label("Column"), dbc.Input(id="ba-peaks-col", placeholder="absorbance", size="sm")], width=3),
-                    dbc.Col([dbc.Label("Min height"), dbc.Input(id="ba-peaks-height", type="number", size="sm")], width=2),
-                    dbc.Col([dbc.Label("Min prominence"), dbc.Input(id="ba-peaks-prom", type="number", size="sm")], width=2),
+                    dbc.Col(
+                        [
+                            dbc.Label("Column"),
+                            dbc.Input(id="ba-peaks-col", placeholder="absorbance", size="sm"),
+                        ],
+                        width=3,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Label("Min height"),
+                            dbc.Input(id="ba-peaks-height", type="number", size="sm"),
+                        ],
+                        width=2,
+                    ),
+                    dbc.Col(
+                        [
+                            dbc.Label("Min prominence"),
+                            dbc.Input(id="ba-peaks-prom", type="number", size="sm"),
+                        ],
+                        width=2,
+                    ),
                 ],
                 className="g-2 mb-3",
             ),
-            dbc.Button("Run Batch Peak Analysis", id="ba-peaks-btn", color="primary", className="mb-3"),
+            dbc.Button(
+                "Run Batch Peak Analysis", id="ba-peaks-btn", color="primary", className="mb-3"
+            ),
             html.Div(id="ba-peaks-output"),
         ]
     )
@@ -211,9 +275,12 @@ def run_batch_peaks(n, dataset_names, col, height, prom):
     datasets = {nm: state.get_dataset(nm) for nm in dataset_names}
     datasets = {nm: d for nm, d in datasets.items() if d is not None}
     try:
-        result = batch_peak_analysis(datasets, column=col or None,
-                                     height=float(height) if height else None,
-                                     prominence=float(prom) if prom else None)
+        result = batch_peak_analysis(
+            datasets,
+            column=col or None,
+            height=float(height) if height else None,
+            prominence=float(prom) if prom else None,
+        )
         if isinstance(result, pd.DataFrame):
             return _df_table(result)
         return html.Pre(str(result), className="result-box")
@@ -222,6 +289,7 @@ def run_batch_peaks(n, dataset_names, col, height, prom):
 
 
 # ── Workflow Presets tab ──────────────────────────────────────────────────────
+
 
 def _presets_tab():
     try:
@@ -236,8 +304,22 @@ def _presets_tab():
             html.H5("Save Current Configuration as Preset"),
             dbc.Row(
                 [
-                    dbc.Col([dbc.Label("Preset name"), dbc.Input(id="ba-preset-name", placeholder="my_workflow", size="sm")], width=4),
-                    dbc.Col(dbc.Button("Save Preset", id="ba-preset-save-btn", color="primary", className="mt-4"), width=2),
+                    dbc.Col(
+                        [
+                            dbc.Label("Preset name"),
+                            dbc.Input(id="ba-preset-name", placeholder="my_workflow", size="sm"),
+                        ],
+                        width=4,
+                    ),
+                    dbc.Col(
+                        dbc.Button(
+                            "Save Preset",
+                            id="ba-preset-save-btn",
+                            color="primary",
+                            className="mt-4",
+                        ),
+                        width=2,
+                    ),
                 ],
                 className="g-2 mb-3",
             ),
@@ -245,10 +327,29 @@ def _presets_tab():
             html.H5("Load / Delete Preset"),
             dbc.Row(
                 [
-                    dbc.Col([dbc.Label("Preset"), dcc.Dropdown(id="ba-preset-select", options=preset_opts,
-                                                                placeholder="Select preset…")], width=4),
-                    dbc.Col(dbc.Button("Load", id="ba-preset-load-btn", color="secondary", className="mt-4"), width=2),
-                    dbc.Col(dbc.Button("Delete", id="ba-preset-del-btn", color="danger", className="mt-4"), width=2),
+                    dbc.Col(
+                        [
+                            dbc.Label("Preset"),
+                            dcc.Dropdown(
+                                id="ba-preset-select",
+                                options=preset_opts,
+                                placeholder="Select preset…",
+                            ),
+                        ],
+                        width=4,
+                    ),
+                    dbc.Col(
+                        dbc.Button(
+                            "Load", id="ba-preset-load-btn", color="secondary", className="mt-4"
+                        ),
+                        width=2,
+                    ),
+                    dbc.Col(
+                        dbc.Button(
+                            "Delete", id="ba-preset-del-btn", color="danger", className="mt-4"
+                        ),
+                        width=2,
+                    ),
                 ],
                 className="g-2 mb-3",
             ),
@@ -304,15 +405,23 @@ def manage_presets(save_n, load_n, del_n, name, selected, ds_names, stats_col):
 
 # ── Helper ────────────────────────────────────────────────────────────────────
 
+
 def _df_table(df: pd.DataFrame):
     return dash_table.DataTable(
         data=df.to_dict("records"),
         columns=[{"name": c, "id": c} for c in df.columns],
         style_table={"overflowX": "auto"},
-        style_cell={"backgroundColor": "var(--bg-primary)", "color": "var(--text-primary)",
-                    "border": "1px solid var(--border)", "fontSize": "0.82rem"},
-        style_header={"backgroundColor": "var(--bg-secondary)", "fontWeight": "600",
-                      "color": "var(--text-muted)"},
+        style_cell={
+            "backgroundColor": "var(--bg-primary)",
+            "color": "var(--text-primary)",
+            "border": "1px solid var(--border)",
+            "fontSize": "0.82rem",
+        },
+        style_header={
+            "backgroundColor": "var(--bg-secondary)",
+            "fontWeight": "600",
+            "color": "var(--text-muted)",
+        },
         export_format="csv",
         page_size=20,
     )

@@ -25,6 +25,8 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import Dash, Input, Output, dcc, html
 
+from dash_app.themes import DEFAULT_THEME, THEMES as _THEMES
+
 # ── App instance ──────────────────────────────────────────────────────────────
 
 app = Dash(
@@ -52,6 +54,7 @@ _logo_path = _REPO_ROOT / "logo.png"
 def _embed_logo() -> str:
     try:
         import base64
+
         return "data:image/png;base64," + base64.b64encode(_logo_path.read_bytes()).decode()
     except Exception:
         return ""
@@ -61,6 +64,7 @@ _logo_img_src = _embed_logo()
 
 
 # ── Sidebar helpers ───────────────────────────────────────────────────────────
+
 
 def _nav_link(label: str, href: str) -> dbc.NavLink:
     return dbc.NavLink(label, href=href, active="exact", className="sidebar-link")
@@ -83,8 +87,23 @@ def _nav_section(title: str, links: list, id_suffix: str) -> html.Details:
 sidebar = html.Div(
     [
         html.Div(
-            html.Img(src=_logo_img_src, className="sidebar-logo-img") if _logo_img_src else html.Div(),
+            html.Img(src=_logo_img_src, className="sidebar-logo-img")
+            if _logo_img_src
+            else html.Div(),
             className="sidebar-logo-wrap",
+        ),
+        html.Div(
+            [
+                html.Button(
+                    "",
+                    id=f"theme-btn-{slug}",
+                    className=f"theme-swatch theme-swatch-{slug}",
+                    title=label,
+                    **{"data-theme-slug": slug},
+                )
+                for slug, label in _THEMES
+            ],
+            className="theme-switcher",
         ),
         html.Nav(
             [
@@ -160,6 +179,8 @@ sidebar = html.Div(
 app.layout = html.Div(
     [
         dcc.Location(id="url"),
+        dcc.Store(id="theme-store", storage_type="local", data=DEFAULT_THEME),
+        html.Div(id="_theme-target", children="", style={"display": "none"}),
         dbc.Toast(
             id="global-toast",
             header="Plottle",
@@ -202,11 +223,13 @@ _SHUTDOWN_HTML = """<!doctype html>
 def _shutdown_page():
     """Serve a goodbye page then kill the process."""
     from flask import Response
+
     threading.Timer(0.6, lambda: os._exit(0)).start()
     return Response(_SHUTDOWN_HTML, mimetype="text/html")
 
 
 # ── Exit callback ─────────────────────────────────────────────────────────────
+
 
 @app.callback(
     Output("url", "pathname"),
@@ -216,6 +239,40 @@ def _shutdown_page():
 def on_exit(n_clicks):
     """Redirect to /shutdown, which serves a goodbye page then kills the process."""
     return "/shutdown"
+
+
+# ── Theme callbacks ───────────────────────────────────────────────────────────
+
+app.clientside_callback(
+    """
+    function(theme) {
+        var t = theme || 'nccu-dark';
+        document.documentElement.setAttribute('data-theme', t);
+        document.querySelectorAll('.theme-swatch').forEach(function(b) {
+            b.classList.toggle('swatch-active', b.getAttribute('data-theme-slug') === t);
+        });
+        return t;
+    }
+    """,
+    Output("_theme-target", "children"),
+    Input("theme-store", "data"),
+)
+
+
+@app.callback(
+    Output("theme-store", "data"),
+    [Input(f"theme-btn-{slug}", "n_clicks") for slug, _ in _THEMES],
+    prevent_initial_call=True,
+)
+def on_swatch_click(*_):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        return dash.no_update
+    btn_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    for slug, _ in _THEMES:
+        if f"theme-btn-{slug}" == btn_id:
+            return slug
+    return dash.no_update
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────

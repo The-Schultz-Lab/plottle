@@ -24,7 +24,6 @@ import base64
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from plottle.io import save_data
 
 dash.register_page(__name__, path="/export", title="Export — Plottle", name="Export")
 
@@ -35,7 +34,10 @@ def layout(**kwargs):
             html.Div(
                 [
                     html.H1("Export Results", className="page-title"),
-                    html.P("Download datasets, analysis results, and session state.", className="page-caption"),
+                    html.P(
+                        "Download datasets, analysis results, and session state.",
+                        className="page-caption",
+                    ),
                 ],
                 className="page-header",
             ),
@@ -48,7 +50,9 @@ def layout(**kwargs):
                             dbc.Label("Dataset"),
                             dcc.Dropdown(
                                 id="ex-ds-select",
-                                options=[{"label": n, "value": n} for n in state.get_dataset_names()],
+                                options=[
+                                    {"label": n, "value": n} for n in state.get_dataset_names()
+                                ],
                                 value=state._STATE.get("current_dataset"),
                                 clearable=False,
                                 placeholder="Select dataset…",
@@ -75,7 +79,12 @@ def layout(**kwargs):
                         width=3,
                     ),
                     dbc.Col(
-                        dbc.Button("Download Dataset", id="ex-ds-btn", color="primary", className="mt-4 w-100"),
+                        dbc.Button(
+                            "Download Dataset",
+                            id="ex-ds-btn",
+                            color="primary",
+                            className="mt-4 w-100",
+                        ),
                         width=3,
                     ),
                 ],
@@ -94,7 +103,12 @@ def layout(**kwargs):
             dbc.Row(
                 [
                     dbc.Col(
-                        dbc.Button("Save Session (JSON)", id="ex-session-save-btn", color="primary", className="w-100"),
+                        dbc.Button(
+                            "Save Session (JSON)",
+                            id="ex-session-save-btn",
+                            color="primary",
+                            className="w-100",
+                        ),
                         width=3,
                     ),
                     dbc.Col(
@@ -104,9 +118,14 @@ def layout(**kwargs):
                                 id="ex-session-upload",
                                 children=html.Div(["Drop or ", html.A("select session .json")]),
                                 accept=".json",
-                                style={"border": "2px dashed var(--border)", "borderRadius": "6px",
-                                       "padding": "0.4rem", "textAlign": "center", "cursor": "pointer",
-                                       "background": "var(--bg-secondary)"},
+                                style={
+                                    "border": "2px dashed var(--border)",
+                                    "borderRadius": "6px",
+                                    "padding": "0.4rem",
+                                    "textAlign": "center",
+                                    "cursor": "pointer",
+                                    "background": "var(--bg-secondary)",
+                                },
                             ),
                         ],
                         width=4,
@@ -123,15 +142,19 @@ def layout(**kwargs):
 def _analysis_section():
     results = state.get_analysis_results()
     if not results:
-        return dbc.Alert("No analysis results yet. Run analyses in the Analysis Tools page first.", color="info")
+        return dbc.Alert(
+            "No analysis results yet. Run analyses in the Analysis Tools page first.", color="info"
+        )
 
     rows = [
-        html.Tr([
-            html.Td(str(i + 1)),
-            html.Td(r.get("type", "—")),
-            html.Td(r.get("dataset", "—")),
-            html.Td(r.get("timestamp", "—")[:19]),
-        ])
+        html.Tr(
+            [
+                html.Td(str(i + 1)),
+                html.Td(r.get("type", "—")),
+                html.Td(r.get("dataset", "—")),
+                html.Td(r.get("timestamp", "—")[:19]),
+            ]
+        )
         for i, r in enumerate(results)
     ]
 
@@ -139,10 +162,17 @@ def _analysis_section():
         [
             dbc.Table(
                 [
-                    html.Thead(html.Tr([html.Th("#"), html.Th("Type"), html.Th("Dataset"), html.Th("Time")])),
+                    html.Thead(
+                        html.Tr(
+                            [html.Th("#"), html.Th("Type"), html.Th("Dataset"), html.Th("Time")]
+                        )
+                    ),
                     html.Tbody(rows),
                 ],
-                bordered=True, hover=True, size="sm", className="mb-2",
+                bordered=True,
+                hover=True,
+                size="sm",
+                className="mb-2",
             ),
             dbc.Button("Download All as JSON", id="ex-analysis-btn", color="secondary"),
         ]
@@ -150,6 +180,7 @@ def _analysis_section():
 
 
 # ── Dataset download ──────────────────────────────────────────────────────────
+
 
 @callback(
     Output("ex-ds-download", "data"),
@@ -172,13 +203,28 @@ def download_dataset(n, ds_name, fmt):
     stem = Path(ds_name).stem
     try:
         if fmt == "csv" and isinstance(data, pd.DataFrame):
-            return dcc.send_data_frame(data.to_csv, f"{stem}.csv", index=False), "", False, "success"
+            return (
+                dcc.send_data_frame(data.to_csv, f"{stem}.csv", index=False),
+                "",
+                False,
+                "success",
+            )
 
         if fmt == "json" and isinstance(data, pd.DataFrame):
-            return dcc.send_data_frame(data.to_json, f"{stem}.json", orient="records"), "", False, "success"
+            return (
+                dcc.send_data_frame(data.to_json, f"{stem}.json", orient="records"),
+                "",
+                False,
+                "success",
+            )
 
         if fmt == "xlsx" and isinstance(data, pd.DataFrame):
-            return dcc.send_data_frame(data.to_excel, f"{stem}.xlsx", index=False), "", False, "success"
+            return (
+                dcc.send_data_frame(data.to_excel, f"{stem}.xlsx", index=False),
+                "",
+                False,
+                "success",
+            )
 
         if fmt == "parquet" and isinstance(data, pd.DataFrame):
             buf = io.BytesIO()
@@ -195,7 +241,12 @@ def download_dataset(n, ds_name, fmt):
 
         # Fallback: CSV
         if isinstance(data, pd.DataFrame):
-            return dcc.send_data_frame(data.to_csv, f"{stem}.csv", index=False), "", False, "success"
+            return (
+                dcc.send_data_frame(data.to_csv, f"{stem}.csv", index=False),
+                "",
+                False,
+                "success",
+            )
 
         return dash.no_update, f"Cannot export {type(data).__name__} as {fmt}.", True, "warning"
 
@@ -204,6 +255,7 @@ def download_dataset(n, ds_name, fmt):
 
 
 # ── Analysis download ─────────────────────────────────────────────────────────
+
 
 @callback(
     Output("ex-analysis-download", "data"),
@@ -219,6 +271,7 @@ def download_analysis(n):
 
 
 # ── Session save ──────────────────────────────────────────────────────────────
+
 
 @callback(
     Output("ex-session-download", "data"),
@@ -245,9 +298,13 @@ def save_session(n):
     for name in summary["dataset_names"]:
         data = state.get_dataset(name)
         if isinstance(data, pd.DataFrame):
-            session["datasets"][name] = {"__type__": "DataFrame", "__data__": data.to_json(orient="split")}
+            session["datasets"][name] = {
+                "__type__": "DataFrame",
+                "__data__": data.to_json(orient="split"),
+            }
         elif isinstance(data, np.ndarray):
             import pickle
+
             session["datasets"][name] = {
                 "__type__": "ndarray",
                 "__data__": base64.b64encode(pickle.dumps(data)).decode("utf-8"),
@@ -261,6 +318,7 @@ def save_session(n):
 
 
 # ── Session load ──────────────────────────────────────────────────────────────
+
 
 @callback(
     Output("ex-session-feedback", "children"),

@@ -25,7 +25,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
 from plottle.io import downsample_for_preview, load_data
-from plottle.math import calculate_statistics, check_normality
+from plottle.math import calculate_statistics
 from plottle.batch import batch_load_files, scan_directory
 
 dash.register_page(__name__, path="/data-upload", title="Data Upload — Plottle", name="Data Upload")
@@ -100,7 +100,9 @@ def layout(**kwargs):
             html.Div(
                 [
                     html.H1("Data Upload", className="page-title"),
-                    html.P("Load datasets from file, examples, or a folder.", className="page-caption"),
+                    html.P(
+                        "Load datasets from file, examples, or a folder.", className="page-caption"
+                    ),
                 ],
                 className="page-header",
             ),
@@ -198,7 +200,9 @@ def handle_upload(contents, filename, last_modified):
             metadata={"file_size": file_size, "downsampled_preview": is_large},
         )
 
-        feedback = [dbc.Alert(f"Loaded '{filename}' successfully.", color="success", dismissable=True)]
+        feedback = [
+            dbc.Alert(f"Loaded '{filename}' successfully.", color="success", dismissable=True)
+        ]
         if is_large:
             feedback.append(
                 dbc.Alert(
@@ -224,7 +228,9 @@ def handle_upload(contents, filename, last_modified):
                     id="du-traceback-collapse",
                     is_open=False,
                 ),
-                dbc.Button("Show error details", id="du-traceback-btn", size="sm", color="secondary"),
+                dbc.Button(
+                    "Show error details", id="du-traceback-btn", size="sm", color="secondary"
+                ),
             ]
         ), dash.no_update
 
@@ -237,7 +243,9 @@ def _examples_tab():
             color="warning",
         )
 
-    available = [(fname, meta) for fname, meta in _EXAMPLES.items() if (_EXAMPLE_DIR / fname).exists()]
+    available = [
+        (fname, meta) for fname, meta in _EXAMPLES.items() if (_EXAMPLE_DIR / fname).exists()
+    ]
 
     rows = []
     for i in range(0, len(available), 2):
@@ -292,7 +300,6 @@ def load_example(n_clicks_list):
     if not ctx.triggered or not any(n_clicks_list):
         return dash.no_update, dash.no_update
 
-    triggered_id = ctx.triggered[0]["prop_id"]
     fname = dash.callback_context.triggered_id["index"]
     fpath = _EXAMPLE_DIR / fname
     meta = _EXAMPLES.get(fname, {})
@@ -346,9 +353,25 @@ def _batch_tab():
                             id="batch-exts",
                             options=[
                                 {"label": e, "value": e}
-                                for e in ["csv", "xlsx", "xls", "tsv", "json", "parquet",
-                                          "pkl", "npy", "npz", "jdx", "dx", "h5", "hdf5",
-                                          "nc", "cdf", "spc", "asc"]
+                                for e in [
+                                    "csv",
+                                    "xlsx",
+                                    "xls",
+                                    "tsv",
+                                    "json",
+                                    "parquet",
+                                    "pkl",
+                                    "npy",
+                                    "npz",
+                                    "jdx",
+                                    "dx",
+                                    "h5",
+                                    "hdf5",
+                                    "nc",
+                                    "cdf",
+                                    "spc",
+                                    "asc",
+                                ]
                             ],
                             value=["csv", "xlsx", "tsv"],
                             multi=True,
@@ -361,11 +384,21 @@ def _batch_tab():
             dbc.Row(
                 [
                     dbc.Col(
-                        dbc.Button("Scan Directory", id="batch-scan-btn", color="secondary", className="w-100"),
+                        dbc.Button(
+                            "Scan Directory",
+                            id="batch-scan-btn",
+                            color="secondary",
+                            className="w-100",
+                        ),
                         width=3,
                     ),
                     dbc.Col(
-                        dbc.Button("Load All Files", id="batch-load-btn", color="primary", className="w-100"),
+                        dbc.Button(
+                            "Load All Files",
+                            id="batch-load-btn",
+                            color="primary",
+                            className="w-100",
+                        ),
                         width=3,
                     ),
                 ],
@@ -418,8 +451,12 @@ def batch_action(scan_n, load_n, folder, exts, pattern):
                 data=meta_rows,
                 columns=[{"name": c, "id": c} for c in meta_rows[0]],
                 style_table={"overflowX": "auto"},
-                style_cell={"backgroundColor": "var(--bg-primary)", "color": "var(--text-primary)",
-                            "border": "1px solid var(--border)", "fontSize": "0.82rem"},
+                style_cell={
+                    "backgroundColor": "var(--bg-primary)",
+                    "color": "var(--text-primary)",
+                    "border": "1px solid var(--border)",
+                    "fontSize": "0.82rem",
+                },
                 style_header={"backgroundColor": "var(--bg-secondary)", "fontWeight": "600"},
                 page_size=10,
             ),
@@ -436,22 +473,31 @@ def batch_action(scan_n, load_n, folder, exts, pattern):
         bmeta = result["metadata"]
 
         for name, data in loaded.items():
-            state.add_dataset(name, data, metadata={"source": "batch_import",
-                                                     "size_bytes": bmeta[name]["size_bytes"]})
+            state.add_dataset(
+                name,
+                data,
+                metadata={"source": "batch_import", "size_bytes": bmeta[name]["size_bytes"]},
+            )
 
         feedback = [scan_result]
         if loaded:
-            feedback.append(dbc.Alert(f"Loaded {len(loaded)} dataset(s): " +
-                                      ", ".join(loaded.keys()), color="success"))
+            feedback.append(
+                dbc.Alert(
+                    f"Loaded {len(loaded)} dataset(s): " + ", ".join(loaded.keys()), color="success"
+                )
+            )
         if errors:
             feedback.append(dbc.Alert(f"{len(errors)} file(s) failed.", color="warning"))
 
         return html.Div(feedback), _datasets_section()
     except Exception as e:
-        return html.Div([scan_result, dbc.Alert(f"Load error: {e}", color="danger")]), dash.no_update
+        return html.Div(
+            [scan_result, dbc.Alert(f"Load error: {e}", color="danger")]
+        ), dash.no_update
 
 
 # ── Datasets section ──────────────────────────────────────────────────────────
+
 
 @callback(Output("du-datasets-section", "children"), Input("du-tabs", "active_tab"))
 def refresh_datasets_section(_):
@@ -464,7 +510,9 @@ def _datasets_section():
         return html.Div(
             [
                 html.H3("Loaded Datasets"),
-                dbc.Alert("No datasets loaded yet. Upload a file above to get started.", color="info"),
+                dbc.Alert(
+                    "No datasets loaded yet. Upload a file above to get started.", color="info"
+                ),
             ]
         )
 
@@ -490,7 +538,12 @@ def _datasets_section():
                         width=2,
                     ),
                     dbc.Col(
-                        dbc.Button("Set Active", id="du-set-active-btn", color="secondary", className="w-100"),
+                        dbc.Button(
+                            "Set Active",
+                            id="du-set-active-btn",
+                            color="secondary",
+                            className="w-100",
+                        ),
                         width=2,
                     ),
                 ],
@@ -515,12 +568,17 @@ def show_dataset_detail(name: Optional[str]):
 
     info_items = [
         html.Div(f"Type: {meta.get('data_type', 'Unknown')}", className="dataset-card-meta"),
-        html.Div(f"Added: {meta.get('added_time', 'Unknown')[:19].replace('T', ' ')}", className="dataset-card-meta"),
+        html.Div(
+            f"Added: {meta.get('added_time', 'Unknown')[:19].replace('T', ' ')}",
+            className="dataset-card-meta",
+        ),
     ]
     if "shape" in meta:
         info_items.append(html.Div(f"Shape: {meta['shape']}", className="dataset-card-meta"))
     if "columns" in meta:
-        info_items.append(html.Div(f"Columns: {', '.join(meta['columns'])}", className="dataset-card-meta"))
+        info_items.append(
+            html.Div(f"Columns: {', '.join(meta['columns'])}", className="dataset-card-meta")
+        )
 
     return html.Div(
         [
@@ -570,11 +628,20 @@ def _data_preview(data, name: str):
             data=preview.to_dict("records"),
             columns=[{"name": c, "id": c} for c in preview.columns],
             style_table={"overflowX": "auto", "maxHeight": "300px", "overflowY": "auto"},
-            style_cell={"backgroundColor": "var(--bg-primary)", "color": "var(--text-primary)",
-                        "border": "1px solid var(--border)", "fontSize": "0.82rem", "maxWidth": "200px",
-                        "overflow": "hidden", "textOverflow": "ellipsis"},
-            style_header={"backgroundColor": "var(--bg-secondary)", "fontWeight": "600",
-                          "color": "var(--text-muted)"},
+            style_cell={
+                "backgroundColor": "var(--bg-primary)",
+                "color": "var(--text-primary)",
+                "border": "1px solid var(--border)",
+                "fontSize": "0.82rem",
+                "maxWidth": "200px",
+                "overflow": "hidden",
+                "textOverflow": "ellipsis",
+            },
+            style_header={
+                "backgroundColor": "var(--bg-secondary)",
+                "fontWeight": "600",
+                "color": "var(--text-muted)",
+            },
             page_size=20,
             fixed_rows={"headers": True},
         )
@@ -583,7 +650,9 @@ def _data_preview(data, name: str):
         preview = data.flatten()[:100]
         return html.Div(
             [
-                html.P(f"Array shape: {shape_str} | dtype: {data.dtype}", className="text-muted-sm"),
+                html.P(
+                    f"Array shape: {shape_str} | dtype: {data.dtype}", className="text-muted-sm"
+                ),
                 html.Pre(str(preview), className="result-box"),
             ]
         )
@@ -600,14 +669,46 @@ def _quick_stats(data, name: str):
             stats = calculate_statistics(data[col].dropna().values)
             return dbc.Row(
                 [
-                    dbc.Col(html.Div([html.Div(f"{stats['mean']:.4g}", className="metric-value"),
-                                      html.Div("Mean", className="metric-label")], className="metric-card"), width=3),
-                    dbc.Col(html.Div([html.Div(f"{stats['std']:.4g}", className="metric-value"),
-                                      html.Div("Std Dev", className="metric-label")], className="metric-card"), width=3),
-                    dbc.Col(html.Div([html.Div(f"{stats['min']:.4g}", className="metric-value"),
-                                      html.Div("Min", className="metric-label")], className="metric-card"), width=3),
-                    dbc.Col(html.Div([html.Div(f"{stats['max']:.4g}", className="metric-value"),
-                                      html.Div("Max", className="metric-label")], className="metric-card"), width=3),
+                    dbc.Col(
+                        html.Div(
+                            [
+                                html.Div(f"{stats['mean']:.4g}", className="metric-value"),
+                                html.Div("Mean", className="metric-label"),
+                            ],
+                            className="metric-card",
+                        ),
+                        width=3,
+                    ),
+                    dbc.Col(
+                        html.Div(
+                            [
+                                html.Div(f"{stats['std']:.4g}", className="metric-value"),
+                                html.Div("Std Dev", className="metric-label"),
+                            ],
+                            className="metric-card",
+                        ),
+                        width=3,
+                    ),
+                    dbc.Col(
+                        html.Div(
+                            [
+                                html.Div(f"{stats['min']:.4g}", className="metric-value"),
+                                html.Div("Min", className="metric-label"),
+                            ],
+                            className="metric-card",
+                        ),
+                        width=3,
+                    ),
+                    dbc.Col(
+                        html.Div(
+                            [
+                                html.Div(f"{stats['max']:.4g}", className="metric-value"),
+                                html.Div("Max", className="metric-label"),
+                            ],
+                            className="metric-card",
+                        ),
+                        width=3,
+                    ),
                 ],
                 className="g-2",
             )
@@ -619,14 +720,46 @@ def _quick_stats(data, name: str):
             stats = calculate_statistics(flat)
             return dbc.Row(
                 [
-                    dbc.Col(html.Div([html.Div(f"{stats['mean']:.4g}", className="metric-value"),
-                                      html.Div("Mean", className="metric-label")], className="metric-card"), width=3),
-                    dbc.Col(html.Div([html.Div(f"{stats['std']:.4g}", className="metric-value"),
-                                      html.Div("Std Dev", className="metric-label")], className="metric-card"), width=3),
-                    dbc.Col(html.Div([html.Div(f"{stats['min']:.4g}", className="metric-value"),
-                                      html.Div("Min", className="metric-label")], className="metric-card"), width=3),
-                    dbc.Col(html.Div([html.Div(f"{stats['max']:.4g}", className="metric-value"),
-                                      html.Div("Max", className="metric-label")], className="metric-card"), width=3),
+                    dbc.Col(
+                        html.Div(
+                            [
+                                html.Div(f"{stats['mean']:.4g}", className="metric-value"),
+                                html.Div("Mean", className="metric-label"),
+                            ],
+                            className="metric-card",
+                        ),
+                        width=3,
+                    ),
+                    dbc.Col(
+                        html.Div(
+                            [
+                                html.Div(f"{stats['std']:.4g}", className="metric-value"),
+                                html.Div("Std Dev", className="metric-label"),
+                            ],
+                            className="metric-card",
+                        ),
+                        width=3,
+                    ),
+                    dbc.Col(
+                        html.Div(
+                            [
+                                html.Div(f"{stats['min']:.4g}", className="metric-value"),
+                                html.Div("Min", className="metric-label"),
+                            ],
+                            className="metric-card",
+                        ),
+                        width=3,
+                    ),
+                    dbc.Col(
+                        html.Div(
+                            [
+                                html.Div(f"{stats['max']:.4g}", className="metric-value"),
+                                html.Div("Max", className="metric-label"),
+                            ],
+                            className="metric-card",
+                        ),
+                        width=3,
+                    ),
                 ],
                 className="g-2",
             )

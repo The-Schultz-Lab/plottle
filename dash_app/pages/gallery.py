@@ -10,7 +10,7 @@ from pathlib import Path
 
 import dash
 import dash_bootstrap_components as dbc
-from dash import Input, Output, callback, dcc, html
+from dash import Input, Output, callback, html
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
@@ -43,8 +43,10 @@ def layout(**kwargs):
         return html.Div(
             [
                 html.Div(
-                    [html.H1("Gallery", className="page-title"),
-                     html.P("Browse pre-rendered example figures.", className="page-caption")],
+                    [
+                        html.H1("Gallery", className="page-title"),
+                        html.P("Browse pre-rendered example figures.", className="page-caption"),
+                    ],
                     className="page-header",
                 ),
                 dbc.Alert(
@@ -82,21 +84,41 @@ def layout(**kwargs):
                     [
                         html.Img(
                             src=img_src,
-                            style={"width": "100%", "height": "160px", "objectFit": "cover",
-                                   "borderRadius": "4px", "marginBottom": "0.5rem"},
+                            style={
+                                "width": "100%",
+                                "height": "160px",
+                                "objectFit": "cover",
+                                "borderRadius": "4px",
+                                "marginBottom": "0.5rem",
+                            },
                             onerror="this.style.display='none'",
-                        ) if img_src else html.Div(
-                            html.P("No image", style={"textAlign": "center", "color": "var(--text-muted)", "lineHeight": "160px", "height": "160px"}),
+                        )
+                        if img_src
+                        else html.Div(
+                            html.P(
+                                "No image",
+                                style={
+                                    "textAlign": "center",
+                                    "color": "var(--text-muted)",
+                                    "lineHeight": "160px",
+                                    "height": "160px",
+                                },
+                            ),
                         ),
                         html.Div(item.get("title", ""), className="gallery-card-title"),
-                        html.Div(item.get("description", ""), className="gallery-card-lib text-muted-sm mb-2"),
+                        html.Div(
+                            item.get("description", ""),
+                            className="gallery-card-lib text-muted-sm mb-2",
+                        ),
                         dbc.Button(
                             "Use this config",
                             id={"type": "gallery-use-btn", "index": item.get("plot_type", "")},
                             size="sm",
                             color="outline-secondary",
                             className="w-100",
-                        ) if item.get("plot_type") else html.Div(),
+                        )
+                        if item.get("plot_type")
+                        else html.Div(),
                     ],
                     className="gallery-card",
                 ),
@@ -108,15 +130,20 @@ def layout(**kwargs):
         # Rows of 3
         rows = []
         for i in range(0, len(cards), 3):
-            rows.append(dbc.Row(cards[i:i+3], className="g-3"))
+            rows.append(dbc.Row(cards[i : i + 3], className="g-3"))
 
         sections.extend([header, *rows])
 
     return html.Div(
         [
             html.Div(
-                [html.H1("Gallery", className="page-title"),
-                 html.P(f"{len(manifest)} example figures grouped by library.", className="page-caption")],
+                [
+                    html.H1("Gallery", className="page-title"),
+                    html.P(
+                        f"{len(manifest)} example figures grouped by library.",
+                        className="page-caption",
+                    ),
+                ],
                 className="page-header",
             ),
             html.Div(id="gallery-feedback"),
@@ -140,8 +167,13 @@ def use_config(n_clicks_list):
     return dbc.Alert(
         [
             f"Config for '{plot_type}' noted. ",
-            dbc.Button("Open Quick Plot →", href="/plot-basic", color="link", className="p-0",
-                       style={"color": "var(--accent)"}),
+            dbc.Button(
+                "Open Quick Plot →",
+                href="/plot-basic",
+                color="link",
+                className="p-0",
+                style={"color": "var(--accent)"},
+            ),
             " and select this plot type.",
         ],
         color="success",

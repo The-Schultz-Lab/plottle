@@ -22,19 +22,22 @@ matplotlib.use("Agg")
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from plottle.plotting import (
-    bar_chart, box_plot, contour_plot, heatmap, histogram,
-    line_plot, scatter_plot, scatter_with_regression,
-    distribution_plot,
-)
 
-dash.register_page(__name__, path="/plot-multiplot", title="Multi-Plot Dashboard — Plottle", name="Multi-Plot")
+dash.register_page(
+    __name__, path="/plot-multiplot", title="Multi-Plot Dashboard — Plottle", name="Multi-Plot"
+)
 
 _GRID_SIZES = ["1×1", "1×2", "2×1", "2×2", "2×3", "3×2", "3×3", "2×4", "4×2", "4×4"]
 
 _SIMPLE_PLOT_TYPES = [
-    "Histogram", "Line Plot", "Scatter Plot", "Bar Chart",
-    "Heatmap", "Contour Plot", "Box Plot", "Scatter with Regression",
+    "Histogram",
+    "Line Plot",
+    "Scatter Plot",
+    "Bar Chart",
+    "Heatmap",
+    "Contour Plot",
+    "Box Plot",
+    "Scatter with Regression",
     "Distribution Plot",
 ]
 
@@ -66,13 +69,21 @@ def layout(**kwargs):
                         width=3,
                     ),
                     dbc.Col(
-                        dbc.Button("Generate All", id="mp-generate-btn",
-                                   color="primary", className="mt-4 w-100"),
+                        dbc.Button(
+                            "Generate All",
+                            id="mp-generate-btn",
+                            color="primary",
+                            className="mt-4 w-100",
+                        ),
                         width=2,
                     ),
                     dbc.Col(
-                        dbc.Button("Export PNG", id="mp-export-btn",
-                                   color="secondary", className="mt-4 w-100"),
+                        dbc.Button(
+                            "Export PNG",
+                            id="mp-export-btn",
+                            color="secondary",
+                            className="mt-4 w-100",
+                        ),
                         width=2,
                     ),
                     dbc.Col(
@@ -90,6 +101,7 @@ def layout(**kwargs):
 
 
 # ── Build cell configuration forms ───────────────────────────────────────────
+
 
 @callback(Output("mp-cell-configs", "children"), Input("mp-grid-size", "value"))
 def build_cell_configs(grid_size: str):
@@ -135,7 +147,7 @@ def build_cell_configs(grid_size: str):
                     ),
                     dbc.Input(
                         id={"type": "mp-title", "index": i},
-                        placeholder=f"Title (optional)",
+                        placeholder="Title (optional)",
                         size="sm",
                         className="mt-1",
                     ),
@@ -149,7 +161,7 @@ def build_cell_configs(grid_size: str):
     # Wrap into rows of `cols` cards
     rows_out = []
     for i in range(0, n, cols):
-        rows_out.append(dbc.Row(cards[i:i+cols], className="g-2"))
+        rows_out.append(dbc.Row(cards[i : i + cols], className="g-2"))
 
     return html.Div(rows_out)
 
@@ -173,6 +185,7 @@ def populate_cols(ds_name):
 
 
 # ── Generate grid ─────────────────────────────────────────────────────────────
+
 
 @callback(
     Output("mp-grid-output", "children"),
@@ -207,21 +220,44 @@ def generate_grid(n, grid_size, ds_names, plot_types, xcols, ycols, titles):
             title = titles[i] if i < len(titles) else ""
 
             if not ds_name:
-                ax.text(0.5, 0.5, "No dataset", ha="center", va="center",
-                        color="gray", transform=ax.transAxes)
+                ax.text(
+                    0.5,
+                    0.5,
+                    "No dataset",
+                    ha="center",
+                    va="center",
+                    color="gray",
+                    transform=ax.transAxes,
+                )
                 continue
 
             data = state.get_dataset(ds_name)
             if data is None:
-                ax.text(0.5, 0.5, "Not found", ha="center", va="center",
-                        color="gray", transform=ax.transAxes)
+                ax.text(
+                    0.5,
+                    0.5,
+                    "Not found",
+                    ha="center",
+                    va="center",
+                    color="gray",
+                    transform=ax.transAxes,
+                )
                 continue
 
             try:
                 _plot_to_ax(ax, data, plot_type, xcol, ycol, title)
             except Exception as exc:
-                ax.text(0.5, 0.5, f"Error:\n{str(exc)[:80]}", ha="center", va="center",
-                        color="#ff8888", transform=ax.transAxes, fontsize=8, wrap=True)
+                ax.text(
+                    0.5,
+                    0.5,
+                    f"Error:\n{str(exc)[:80]}",
+                    ha="center",
+                    va="center",
+                    color="#ff8888",
+                    transform=ax.transAxes,
+                    fontsize=8,
+                    wrap=True,
+                )
 
         # Hide unused axes
         for ax in axes_flat[n_cells:]:
@@ -235,13 +271,16 @@ def generate_grid(n, grid_size, ds_names, plot_types, xcols, ycols, titles):
         buf.seek(0)
         encoded = base64.b64encode(buf.read()).decode("utf-8")
 
-        return html.Img(src=f"data:image/png;base64,{encoded}", style={"width": "100%", "borderRadius": "8px"})
+        return html.Img(
+            src=f"data:image/png;base64,{encoded}", style={"width": "100%", "borderRadius": "8px"}
+        )
 
     except Exception as exc:
         return dbc.Alert(f"Grid generation failed: {exc}", color="danger")
 
 
 # ── Export ────────────────────────────────────────────────────────────────────
+
 
 @callback(
     Output("mp-download", "data"),
@@ -293,6 +332,7 @@ def export_grid(n, grid_size, ds_names, plot_types, xcols, ycols, titles):
 
 
 # ── Plot to axis ──────────────────────────────────────────────────────────────
+
 
 def _plot_to_ax(ax, data, plot_type: str, xcol, ycol, title: str = ""):
     """Draw a simple plot directly onto *ax*."""
@@ -351,6 +391,7 @@ def _plot_to_ax(ax, data, plot_type: str, xcol, ycol, title: str = ""):
             ax.plot(xs, m * xs + b, "r--", linewidth=1.5)
     elif plot_type == "Distribution Plot":
         from scipy.stats import gaussian_kde
+
         arr = _1d()
         ax.hist(arr, bins=20, density=True, alpha=0.5, color="#e0a3a3")
         try:

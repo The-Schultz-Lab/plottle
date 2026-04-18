@@ -83,6 +83,8 @@ ignore = []
 [tool.ruff.lint.per-file-ignores]
 "plottle/pages/*.py" = ["E402"]
 "plottle/Home.py" = ["E402"]
+"dash_app/*.py" = ["E402"]
+"dash_app/pages/*.py" = ["E402", "E501"]
 
 [tool.black]
 line-length = 100

@@ -29,21 +29,32 @@ from plottle.utils.user_settings import (
     save_preset,
 )
 from plottle.utils.plot_config import COLOR_PALETTE_NAMES, _FONT_OPTIONS
+from dash_app.themes import DEFAULT_THEME, THEMES as _THEMES
 
 dash.register_page(__name__, path="/settings", title="Settings — Plottle", name="Settings")
 
-_FONT_OPTIONS_LIST = _FONT_OPTIONS if isinstance(_FONT_OPTIONS, list) else [
-    "sans-serif", "serif", "monospace", "Helvetica", "Arial",
-    "Times New Roman", "DejaVu Sans",
-]
+_FONT_OPTIONS_LIST = (
+    _FONT_OPTIONS
+    if isinstance(_FONT_OPTIONS, list)
+    else [
+        "sans-serif",
+        "serif",
+        "monospace",
+        "Helvetica",
+        "Arial",
+        "Times New Roman",
+        "DejaVu Sans",
+    ]
+)
 
-_PALETTE_OPTIONS = (COLOR_PALETTE_NAMES if isinstance(COLOR_PALETTE_NAMES, list) else
-                    ["Default", "Okabe-Ito", "Wong", "Tol Muted", "Pastel", "Vibrant"])
+_PALETTE_OPTIONS = (
+    COLOR_PALETTE_NAMES
+    if isinstance(COLOR_PALETTE_NAMES, list)
+    else ["Default", "Okabe-Ito", "Wong", "Tol Muted", "Pastel", "Vibrant"]
+)
 
 
 def layout(**kwargs):
-    defaults = _safe_get_defaults()
-    presets = _safe_list_presets()
     config_path = _safe_config_path()
 
     return html.Div(
@@ -52,9 +63,11 @@ def layout(**kwargs):
                 [
                     html.H1("Settings", className="page-title"),
                     html.P(
-                        ["Persistent defaults and presets are saved to ",
-                         html.Code(str(config_path)),
-                         ". Changes take effect the next time you open Quick Plot."],
+                        [
+                            "Persistent defaults and presets are saved to ",
+                            html.Code(str(config_path)),
+                            ". Changes take effect the next time you open Quick Plot.",
+                        ],
                         className="page-caption",
                     ),
                 ],
@@ -83,13 +96,55 @@ def render_tab(tab):
     return _config_tab()
 
 
+# ── Theme callbacks ───────────────────────────────────────────────────────────
+
+
+@callback(
+    Output("st-theme-select", "value"),
+    Input("theme-store", "data"),
+)
+def sync_theme_dropdown(theme):
+    return theme or DEFAULT_THEME
+
+
+@callback(
+    Output("theme-store", "data", allow_duplicate=True),
+    Input("st-theme-select", "value"),
+    prevent_initial_call=True,
+)
+def update_theme_from_dropdown(theme):
+    return theme or dash.no_update
+
+
 # ── Defaults tab ──────────────────────────────────────────────────────────────
+
 
 def _defaults_tab():
     defaults = _safe_get_defaults()
     return html.Div(
         [
-            html.P("These values are applied as initial defaults in Quick Plot.", className="text-muted-sm mb-3"),
+            html.Div(
+                [
+                    html.P("APP APPEARANCE", className="config-section-title"),
+                    dbc.Label("Color scheme"),
+                    dcc.Dropdown(
+                        id="st-theme-select",
+                        options=[{"label": label, "value": slug} for slug, label in _THEMES],
+                        value=DEFAULT_THEME,
+                        clearable=False,
+                    ),
+                    html.P(
+                        "Theme is stored in your browser and applies immediately. "
+                        "You can also switch themes with the colored swatches in the sidebar.",
+                        className="text-muted-sm mt-1 mb-0",
+                    ),
+                ],
+                className="mb-4",
+            ),
+            html.P(
+                "These values are applied as initial defaults in Quick Plot.",
+                className="text-muted-sm mb-3",
+            ),
             dbc.Row(
                 [
                     # Typography
@@ -104,14 +159,22 @@ def _defaults_tab():
                                 clearable=False,
                             ),
                             dbc.Label("Font size", className="mt-2"),
-                            dcc.Slider(id="st-fontsize", min=6, max=24, step=1,
-                                       value=defaults.get("fontsize", 10),
-                                       marks={6: "6", 10: "10", 14: "14", 18: "18", 24: "24"},
-                                       tooltip={"placement": "bottom"}),
+                            dcc.Slider(
+                                id="st-fontsize",
+                                min=6,
+                                max=24,
+                                step=1,
+                                value=defaults.get("fontsize", 10),
+                                marks={6: "6", 10: "10", 14: "14", 18: "18", 24: "24"},
+                                tooltip={"placement": "bottom"},
+                            ),
                             dbc.Label("Font color", className="mt-2"),
-                            dbc.Input(id="st-fontcolor", type="color",
-                                      value=defaults.get("fontcolor", "#ffffff"),
-                                      style={"height": "36px", "padding": "2px"}),
+                            dbc.Input(
+                                id="st-fontcolor",
+                                type="color",
+                                value=defaults.get("fontcolor", "#ffffff"),
+                                style={"height": "36px", "padding": "2px"},
+                            ),
                         ],
                         width=4,
                     ),
@@ -120,10 +183,15 @@ def _defaults_tab():
                         [
                             html.P("LINE & GRID", className="config-section-title"),
                             dbc.Label("Line width"),
-                            dcc.Slider(id="st-linewidth", min=0.5, max=5.0, step=0.25,
-                                       value=defaults.get("linewidth", 1.5),
-                                       marks={1: "1", 2: "2", 3: "3", 5: "5"},
-                                       tooltip={"placement": "bottom"}),
+                            dcc.Slider(
+                                id="st-linewidth",
+                                min=0.5,
+                                max=5.0,
+                                step=0.25,
+                                value=defaults.get("linewidth", 1.5),
+                                marks={1: "1", 2: "2", 3: "3", 5: "5"},
+                                tooltip={"placement": "bottom"},
+                            ),
                             dbc.Checklist(
                                 id="st-grid",
                                 options=[{"label": " Show grid by default", "value": "grid"}],
@@ -176,7 +244,9 @@ def _defaults_tab():
                 ],
                 className="g-3 mb-3",
             ),
-            dbc.Button("Save Defaults", id="st-save-defaults-btn", color="primary", className="mb-3"),
+            dbc.Button(
+                "Save Defaults", id="st-save-defaults-btn", color="primary", className="mb-3"
+            ),
             html.Div(id="st-defaults-feedback"),
         ]
     )
@@ -195,7 +265,9 @@ def _defaults_tab():
     State("st-legend-pos", "value"),
     prevent_initial_call=True,
 )
-def save_defaults_cb(n, fontfamily, fontsize, fontcolor, linewidth, grid, grid_ls, palette, legend_pos):
+def save_defaults_cb(
+    n, fontfamily, fontsize, fontcolor, linewidth, grid, grid_ls, palette, legend_pos
+):
     if not n:
         return dash.no_update
     new_defaults = {
@@ -217,6 +289,7 @@ def save_defaults_cb(n, fontfamily, fontsize, fontcolor, linewidth, grid, grid_l
 
 # ── Presets tab ───────────────────────────────────────────────────────────────
 
+
 def _presets_tab():
     presets = _safe_list_presets()
     preset_opts = [{"label": p, "value": p} for p in presets]
@@ -226,8 +299,24 @@ def _presets_tab():
             html.H5("Save Current Defaults as Preset"),
             dbc.Row(
                 [
-                    dbc.Col([dbc.Label("Preset name"), dbc.Input(id="st-preset-name", placeholder="publication_style", size="sm")], width=4),
-                    dbc.Col(dbc.Button("Save Preset", id="st-preset-save-btn", color="primary", className="mt-4"), width=2),
+                    dbc.Col(
+                        [
+                            dbc.Label("Preset name"),
+                            dbc.Input(
+                                id="st-preset-name", placeholder="publication_style", size="sm"
+                            ),
+                        ],
+                        width=4,
+                    ),
+                    dbc.Col(
+                        dbc.Button(
+                            "Save Preset",
+                            id="st-preset-save-btn",
+                            color="primary",
+                            className="mt-4",
+                        ),
+                        width=2,
+                    ),
                 ],
                 className="g-2 mb-3",
             ),
@@ -235,10 +324,29 @@ def _presets_tab():
             html.H5("Load / Delete Preset"),
             dbc.Row(
                 [
-                    dbc.Col([dbc.Label("Preset"), dcc.Dropdown(id="st-preset-select", options=preset_opts,
-                                                                 placeholder="Select preset…")], width=4),
-                    dbc.Col(dbc.Button("Load", id="st-preset-load-btn", color="secondary", className="mt-4"), width=2),
-                    dbc.Col(dbc.Button("Delete", id="st-preset-del-btn", color="danger", className="mt-4"), width=2),
+                    dbc.Col(
+                        [
+                            dbc.Label("Preset"),
+                            dcc.Dropdown(
+                                id="st-preset-select",
+                                options=preset_opts,
+                                placeholder="Select preset…",
+                            ),
+                        ],
+                        width=4,
+                    ),
+                    dbc.Col(
+                        dbc.Button(
+                            "Load", id="st-preset-load-btn", color="secondary", className="mt-4"
+                        ),
+                        width=2,
+                    ),
+                    dbc.Col(
+                        dbc.Button(
+                            "Delete", id="st-preset-del-btn", color="danger", className="mt-4"
+                        ),
+                        width=2,
+                    ),
                 ],
                 className="g-2 mb-3",
             ),
@@ -274,10 +382,12 @@ def manage_presets(save_n, load_n, del_n, name, selected):
             return dbc.Alert("Select a preset.", color="warning")
         try:
             p = load_preset(selected)
-            return html.Div([
-                dbc.Alert(f"Loaded preset '{selected}'.", color="success", dismissable=True),
-                html.Pre(json.dumps(p, indent=2), className="result-box"),
-            ])
+            return html.Div(
+                [
+                    dbc.Alert(f"Loaded preset '{selected}'.", color="success", dismissable=True),
+                    html.Pre(json.dumps(p, indent=2), className="result-box"),
+                ]
+            )
         except Exception as e:
             return dbc.Alert(str(e), color="danger")
 
@@ -295,6 +405,7 @@ def manage_presets(save_n, load_n, del_n, name, selected):
 
 # ── Config file tab ───────────────────────────────────────────────────────────
 
+
 def _config_tab():
     config_path = _safe_config_path()
     raw = ""
@@ -306,10 +417,15 @@ def _config_tab():
 
     return html.Div(
         [
-            html.P(["Config file location: ", html.Code(str(config_path))], className="text-muted-sm mb-3"),
+            html.P(
+                ["Config file location: ", html.Code(str(config_path))],
+                className="text-muted-sm mb-3",
+            ),
             html.H5("Raw config.json"),
             html.Pre(raw or "(file does not exist yet)", className="result-box"),
-            dbc.Button("Clear config.json", id="st-clear-config-btn", color="danger", className="mt-2"),
+            dbc.Button(
+                "Clear config.json", id="st-clear-config-btn", color="danger", className="mt-2"
+            ),
             html.Div(id="st-config-feedback", className="mt-2"),
         ]
     )
@@ -334,6 +450,7 @@ def clear_config(n):
 
 
 # ── Safe wrappers ─────────────────────────────────────────────────────────────
+
 
 def _safe_get_defaults() -> dict:
     try:

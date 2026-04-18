@@ -21,7 +21,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import seaborn as sns
 from dash import Input, Output, State, callback, dcc, html
 import base64
@@ -31,7 +30,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
 
-dash.register_page(__name__, path="/plot-advanced", title="Advanced Plotting — Plottle", name="Advanced Plotting")
+dash.register_page(
+    __name__, path="/plot-advanced", title="Advanced Plotting — Plottle", name="Advanced Plotting"
+)
 
 
 def layout(**kwargs):
@@ -44,7 +45,10 @@ def layout(**kwargs):
             html.Div(
                 [
                     html.H1("Advanced Plotting", className="page-title"),
-                    html.P("Seaborn statistical and Plotly interactive visualizations.", className="page-caption"),
+                    html.P(
+                        "Seaborn statistical and Plotly interactive visualizations.",
+                        className="page-caption",
+                    ),
                 ],
                 className="page-header",
             ),
@@ -52,8 +56,13 @@ def layout(**kwargs):
                 dbc.Col(
                     [
                         dbc.Label("Dataset"),
-                        dcc.Dropdown(id="ap-dataset", options=ds_opts, value=current,
-                                     clearable=False, placeholder="Select dataset…"),
+                        dcc.Dropdown(
+                            id="ap-dataset",
+                            options=ds_opts,
+                            value=current,
+                            clearable=False,
+                            placeholder="Select dataset…",
+                        ),
                     ],
                     width=5,
                 ),
@@ -96,28 +105,43 @@ def render_tab(tab, ds_name):
                         dbc.Col(
                             [
                                 dbc.Label("Columns (leave empty for all numeric)"),
-                                dcc.Dropdown(id="ap-corr-cols", options=col_opts, value=[],
-                                             multi=True, placeholder="All numeric columns"),
+                                dcc.Dropdown(
+                                    id="ap-corr-cols",
+                                    options=col_opts,
+                                    value=[],
+                                    multi=True,
+                                    placeholder="All numeric columns",
+                                ),
                             ],
                             width=6,
                         ),
                         dbc.Col(
                             [
                                 dbc.Label("Method"),
-                                dcc.Dropdown(id="ap-corr-method",
-                                             options=[{"label": m.capitalize(), "value": m}
-                                                      for m in ["pearson", "spearman", "kendall"]],
-                                             value="pearson", clearable=False),
+                                dcc.Dropdown(
+                                    id="ap-corr-method",
+                                    options=[
+                                        {"label": m.capitalize(), "value": m}
+                                        for m in ["pearson", "spearman", "kendall"]
+                                    ],
+                                    value="pearson",
+                                    clearable=False,
+                                ),
                             ],
                             width=3,
                         ),
                         dbc.Col(
                             [
                                 dbc.Label("Style"),
-                                dcc.Dropdown(id="ap-corr-style",
-                                             options=[{"label": "Seaborn", "value": "seaborn"},
-                                                      {"label": "Plotly", "value": "plotly"}],
-                                             value="plotly", clearable=False),
+                                dcc.Dropdown(
+                                    id="ap-corr-style",
+                                    options=[
+                                        {"label": "Seaborn", "value": "seaborn"},
+                                        {"label": "Plotly", "value": "plotly"},
+                                    ],
+                                    value="plotly",
+                                    clearable=False,
+                                ),
                             ],
                             width=3,
                         ),
@@ -137,19 +161,34 @@ def render_tab(tab, ds_name):
                         dbc.Col(
                             [
                                 dbc.Label("Columns to overlay"),
-                                dcc.Dropdown(id="ap-dist-cols", options=col_opts, value=num_cols[:3],
-                                             multi=True, placeholder="Select columns…"),
+                                dcc.Dropdown(
+                                    id="ap-dist-cols",
+                                    options=col_opts,
+                                    value=num_cols[:3],
+                                    multi=True,
+                                    placeholder="Select columns…",
+                                ),
                             ],
                             width=6,
                         ),
                         dbc.Col(
                             [
                                 dbc.Label("Plot type"),
-                                dcc.Dropdown(id="ap-dist-type",
-                                             options=[{"label": t, "value": t}
-                                                      for t in ["KDE + Histogram", "KDE only", "Histogram only",
-                                                                "Violin", "Box"]],
-                                             value="KDE + Histogram", clearable=False),
+                                dcc.Dropdown(
+                                    id="ap-dist-type",
+                                    options=[
+                                        {"label": t, "value": t}
+                                        for t in [
+                                            "KDE + Histogram",
+                                            "KDE only",
+                                            "Histogram only",
+                                            "Violin",
+                                            "Box",
+                                        ]
+                                    ],
+                                    value="KDE + Histogram",
+                                    clearable=False,
+                                ),
                             ],
                             width=3,
                         ),
@@ -167,31 +206,56 @@ def render_tab(tab, ds_name):
                 dbc.Row(
                     [
                         dbc.Col(
-                            [dbc.Label("X (category)"),
-                             dcc.Dropdown(id="ap-cat-x", options=all_opts,
-                                          value=cat_cols[0] if cat_cols else (all_opts[0]["value"] if all_opts else None),
-                                          clearable=False)],
+                            [
+                                dbc.Label("X (category)"),
+                                dcc.Dropdown(
+                                    id="ap-cat-x",
+                                    options=all_opts,
+                                    value=cat_cols[0]
+                                    if cat_cols
+                                    else (all_opts[0]["value"] if all_opts else None),
+                                    clearable=False,
+                                ),
+                            ],
                             width=3,
                         ),
                         dbc.Col(
-                            [dbc.Label("Y (numeric)"),
-                             dcc.Dropdown(id="ap-cat-y", options=col_opts,
-                                          value=num_cols[0] if num_cols else None,
-                                          clearable=False)],
+                            [
+                                dbc.Label("Y (numeric)"),
+                                dcc.Dropdown(
+                                    id="ap-cat-y",
+                                    options=col_opts,
+                                    value=num_cols[0] if num_cols else None,
+                                    clearable=False,
+                                ),
+                            ],
                             width=3,
                         ),
                         dbc.Col(
-                            [dbc.Label("Hue (optional)"),
-                             dcc.Dropdown(id="ap-cat-hue", options=[{"label": "None", "value": ""}] + all_opts,
-                                          value="", clearable=True)],
+                            [
+                                dbc.Label("Hue (optional)"),
+                                dcc.Dropdown(
+                                    id="ap-cat-hue",
+                                    options=[{"label": "None", "value": ""}] + all_opts,
+                                    value="",
+                                    clearable=True,
+                                ),
+                            ],
                             width=3,
                         ),
                         dbc.Col(
-                            [dbc.Label("Type"),
-                             dcc.Dropdown(id="ap-cat-type",
-                                          options=[{"label": t, "value": t}
-                                                   for t in ["Box", "Violin", "Strip", "Swarm", "Bar"]],
-                                          value="Box", clearable=False)],
+                            [
+                                dbc.Label("Type"),
+                                dcc.Dropdown(
+                                    id="ap-cat-type",
+                                    options=[
+                                        {"label": t, "value": t}
+                                        for t in ["Box", "Violin", "Strip", "Swarm", "Bar"]
+                                    ],
+                                    value="Box",
+                                    clearable=False,
+                                ),
+                            ],
                             width=3,
                         ),
                     ],
@@ -207,14 +271,54 @@ def render_tab(tab, ds_name):
             [
                 dbc.Row(
                     [
-                        dbc.Col([dbc.Label("X"), dcc.Dropdown(id="ap-3d-x", options=col_opts,
-                                                               value=num_cols[0] if num_cols else None, clearable=False)], width=3),
-                        dbc.Col([dbc.Label("Y"), dcc.Dropdown(id="ap-3d-y", options=col_opts,
-                                                               value=num_cols[1] if len(num_cols) > 1 else None, clearable=False)], width=3),
-                        dbc.Col([dbc.Label("Z"), dcc.Dropdown(id="ap-3d-z", options=col_opts,
-                                                               value=num_cols[2] if len(num_cols) > 2 else None, clearable=False)], width=3),
-                        dbc.Col([dbc.Label("Color"), dcc.Dropdown(id="ap-3d-c", options=[{"label": "None", "value": ""}] + col_opts,
-                                                                    value="", clearable=True)], width=3),
+                        dbc.Col(
+                            [
+                                dbc.Label("X"),
+                                dcc.Dropdown(
+                                    id="ap-3d-x",
+                                    options=col_opts,
+                                    value=num_cols[0] if num_cols else None,
+                                    clearable=False,
+                                ),
+                            ],
+                            width=3,
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Label("Y"),
+                                dcc.Dropdown(
+                                    id="ap-3d-y",
+                                    options=col_opts,
+                                    value=num_cols[1] if len(num_cols) > 1 else None,
+                                    clearable=False,
+                                ),
+                            ],
+                            width=3,
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Label("Z"),
+                                dcc.Dropdown(
+                                    id="ap-3d-z",
+                                    options=col_opts,
+                                    value=num_cols[2] if len(num_cols) > 2 else None,
+                                    clearable=False,
+                                ),
+                            ],
+                            width=3,
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Label("Color"),
+                                dcc.Dropdown(
+                                    id="ap-3d-c",
+                                    options=[{"label": "None", "value": ""}] + col_opts,
+                                    value="",
+                                    clearable=True,
+                                ),
+                            ],
+                            width=3,
+                        ),
                     ],
                     className="g-2 mb-3",
                 ),
@@ -226,22 +330,57 @@ def render_tab(tab, ds_name):
     if tab == "tab-html":
         return html.Div(
             [
-                html.P("Generate any Plotly figure above, then download it as an interactive HTML file.", className="text-muted-sm"),
+                html.P(
+                    "Generate any Plotly figure above, then download it as an interactive HTML file.",
+                    className="text-muted-sm",
+                ),
                 dbc.Row(
                     [
-                        dbc.Col([dbc.Label("X"), dcc.Dropdown(id="ap-html-x", options=col_opts,
-                                                               value=num_cols[0] if num_cols else None)], width=3),
-                        dbc.Col([dbc.Label("Y"), dcc.Dropdown(id="ap-html-y", options=col_opts,
-                                                               value=num_cols[1] if len(num_cols) > 1 else None)], width=3),
-                        dbc.Col([dbc.Label("Color"), dcc.Dropdown(id="ap-html-c", options=[{"label": "None", "value": ""}] + all_opts,
-                                                                    value="")], width=3),
+                        dbc.Col(
+                            [
+                                dbc.Label("X"),
+                                dcc.Dropdown(
+                                    id="ap-html-x",
+                                    options=col_opts,
+                                    value=num_cols[0] if num_cols else None,
+                                ),
+                            ],
+                            width=3,
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Label("Y"),
+                                dcc.Dropdown(
+                                    id="ap-html-y",
+                                    options=col_opts,
+                                    value=num_cols[1] if len(num_cols) > 1 else None,
+                                ),
+                            ],
+                            width=3,
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Label("Color"),
+                                dcc.Dropdown(
+                                    id="ap-html-c",
+                                    options=[{"label": "None", "value": ""}] + all_opts,
+                                    value="",
+                                ),
+                            ],
+                            width=3,
+                        ),
                         dbc.Col(
                             [
                                 dbc.Label("Plot type"),
-                                dcc.Dropdown(id="ap-html-type",
-                                             options=[{"label": t, "value": t}
-                                                      for t in ["Scatter", "Line", "Bar", "Histogram", "Box"]],
-                                             value="Scatter", clearable=False),
+                                dcc.Dropdown(
+                                    id="ap-html-type",
+                                    options=[
+                                        {"label": t, "value": t}
+                                        for t in ["Scatter", "Line", "Bar", "Histogram", "Box"]
+                                    ],
+                                    value="Scatter",
+                                    clearable=False,
+                                ),
                             ],
                             width=3,
                         ),
@@ -250,8 +389,14 @@ def render_tab(tab, ds_name):
                 ),
                 dbc.Row(
                     [
-                        dbc.Col(dbc.Button("Preview", id="ap-html-preview-btn", color="primary"), width="auto"),
-                        dbc.Col(dbc.Button("Download HTML", id="ap-html-dl-btn", color="secondary"), width="auto"),
+                        dbc.Col(
+                            dbc.Button("Preview", id="ap-html-preview-btn", color="primary"),
+                            width="auto",
+                        ),
+                        dbc.Col(
+                            dbc.Button("Download HTML", id="ap-html-dl-btn", color="secondary"),
+                            width="auto",
+                        ),
                         dbc.Col(dcc.Download(id="ap-html-download"), width="auto"),
                     ],
                     className="g-2 mb-3",
@@ -264,6 +409,7 @@ def render_tab(tab, ds_name):
 
 
 # ── Correlation heatmap ───────────────────────────────────────────────────────
+
 
 @callback(
     Output("ap-corr-output", "children"),
@@ -283,8 +429,14 @@ def gen_corr(n, ds_name, cols, method, style):
     corr = df[use_cols].corr(method=method)
 
     if style == "plotly":
-        fig = px.imshow(corr, text_auto=".2f", color_continuous_scale="RdBu_r",
-                        zmin=-1, zmax=1, title=f"{method.capitalize()} Correlation Matrix")
+        fig = px.imshow(
+            corr,
+            text_auto=".2f",
+            color_continuous_scale="RdBu_r",
+            zmin=-1,
+            zmax=1,
+            title=f"{method.capitalize()} Correlation Matrix",
+        )
         fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
         return dcc.Graph(figure=fig, style={"height": "500px"})
 
@@ -299,6 +451,7 @@ def gen_corr(n, ds_name, cols, method, style):
 
 
 # ── Overlaid distributions ────────────────────────────────────────────────────
+
 
 @callback(
     Output("ap-dist-output", "children"),
@@ -316,9 +469,13 @@ def gen_dist(n, ds_name, cols, dist_type):
     use_cols = [c for c in (cols or []) if c in num_cols] or num_cols[:4]
 
     if dist_type in ("Violin", "Box"):
-        fig = px.violin(df[use_cols].melt(var_name="Column", value_name="Value"),
-                        y="Value", x="Column", box=(dist_type == "Box"),
-                        template="plotly_dark")
+        fig = px.violin(
+            df[use_cols].melt(var_name="Column", value_name="Value"),
+            y="Value",
+            x="Column",
+            box=(dist_type == "Box"),
+            template="plotly_dark",
+        )
         fig.update_layout(paper_bgcolor="rgba(0,0,0,0)")
         return dcc.Graph(figure=fig, style={"height": "450px"})
 
@@ -329,6 +486,7 @@ def gen_dist(n, ds_name, cols, dist_type):
     ax.set_facecolor("#1b1b1b")
 
     from scipy.stats import gaussian_kde
+
     colors = ["#e0a3a3", "#56b4e9", "#2ca02c", "#ff7f0e", "#9467bd", "#8c564b"]
     for i, col in enumerate(use_cols):
         arr = df[col].dropna().values.astype(float)
@@ -339,7 +497,13 @@ def gen_dist(n, ds_name, cols, dist_type):
             try:
                 kde = gaussian_kde(arr)
                 xs = np.linspace(arr.min(), arr.max(), 300)
-                ax.plot(xs, kde(xs), color=c, linewidth=2, label=f"{col} KDE" if dist_type == "KDE only" else "")
+                ax.plot(
+                    xs,
+                    kde(xs),
+                    color=c,
+                    linewidth=2,
+                    label=f"{col} KDE" if dist_type == "KDE only" else "",
+                )
             except Exception:
                 pass
 
@@ -351,6 +515,7 @@ def gen_dist(n, ds_name, cols, dist_type):
 
 
 # ── Grouped categorical ───────────────────────────────────────────────────────
+
 
 @callback(
     Output("ap-cat-output", "children"),
@@ -396,6 +561,7 @@ def gen_cat(n, ds_name, x_col, y_col, hue_col, plot_type):
 
 # ── 3D Scatter ────────────────────────────────────────────────────────────────
 
+
 @callback(
     Output("ap-3d-output", "children"),
     Input("ap-3d-btn", "n_clicks"),
@@ -419,6 +585,7 @@ def gen_3d(n, ds_name, xc, yc, zc, cc):
 
 
 # ── HTML Export ───────────────────────────────────────────────────────────────
+
 
 @callback(
     Output("ap-html-output", "children"),
@@ -482,6 +649,7 @@ def _get_plotly_fig(ds_name, xc, yc, cc, ptype):
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+
 def _get_df(ds_name):
     if not ds_name:
         return None
@@ -495,4 +663,6 @@ def _fig_to_img(fig) -> html.Img:
     plt.close(fig)
     buf.seek(0)
     encoded = base64.b64encode(buf.read()).decode("utf-8")
-    return html.Img(src=f"data:image/png;base64,{encoded}", style={"width": "100%", "borderRadius": "4px"})
+    return html.Img(
+        src=f"data:image/png;base64,{encoded}", style={"width": "100%", "borderRadius": "4px"}
+    )

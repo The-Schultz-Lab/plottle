@@ -10,7 +10,7 @@ from pathlib import Path
 
 import dash
 import dash_bootstrap_components as dbc
-from dash import Input, Output, callback, dcc, html
+from dash import Input, Output, callback, html
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
@@ -22,6 +22,7 @@ _LOGO_PATH = Path(__file__).resolve().parents[2] / "logo.png"
 _LOGO_SRC = "/assets/logo.png" if _LOGO_PATH.exists() else None
 
 # ── Layout ────────────────────────────────────────────────────────────────────
+
 
 def layout(**kwargs):
     return html.Div(
@@ -40,6 +41,7 @@ def layout(**kwargs):
 
 
 # ── Callbacks ─────────────────────────────────────────────────────────────────
+
 
 @callback(Output("home-tab-content", "children"), Input("home-tabs", "active_tab"))
 def render_tab(tab: str):
@@ -207,11 +209,26 @@ def _help_tab():
                     html.Thead(html.Tr([html.Th("Format"), html.Th("Extensions")])),
                     html.Tbody(
                         [
-                            html.Tr([html.Td("Tabular"), html.Td("CSV, TSV, Excel (.xlsx/.xls), JSON, Parquet")]),
+                            html.Tr(
+                                [
+                                    html.Td("Tabular"),
+                                    html.Td("CSV, TSV, Excel (.xlsx/.xls), JSON, Parquet"),
+                                ]
+                            ),
                             html.Tr([html.Td("NumPy"), html.Td(".npy, .npz")]),
                             html.Tr([html.Td("Python"), html.Td("Pickle (.pkl)")]),
-                            html.Tr([html.Td("Spectroscopy"), html.Td("JCAMP-DX (.jdx/.dx), SPC (.spc), ASC (.asc)")]),
-                            html.Tr([html.Td("Scientific"), html.Td("HDF5 (.h5/.hdf5), NetCDF (.nc/.cdf), mzML")]),
+                            html.Tr(
+                                [
+                                    html.Td("Spectroscopy"),
+                                    html.Td("JCAMP-DX (.jdx/.dx), SPC (.spc), ASC (.asc)"),
+                                ]
+                            ),
+                            html.Tr(
+                                [
+                                    html.Td("Scientific"),
+                                    html.Td("HDF5 (.h5/.hdf5), NetCDF (.nc/.cdf), mzML"),
+                                ]
+                            ),
                         ]
                     ),
                 ],
@@ -230,9 +247,15 @@ def _help_tab():
                                     dbc.AccordionItem(
                                         html.Ul(
                                             [
-                                                html.Li("Datasets persist across all pages during a session"),
-                                                html.Li("Use Export → Save Session to preserve work between restarts"),
-                                                html.Li("Saved sessions can be reloaded from the same page"),
+                                                html.Li(
+                                                    "Datasets persist across all pages during a session"
+                                                ),
+                                                html.Li(
+                                                    "Use Export → Save Session to preserve work between restarts"
+                                                ),
+                                                html.Li(
+                                                    "Saved sessions can be reloaded from the same page"
+                                                ),
                                             ]
                                         ),
                                         title="Session management",
@@ -240,9 +263,15 @@ def _help_tab():
                                     dbc.AccordionItem(
                                         html.Ul(
                                             [
-                                                html.Li("Files >50 MB or >10k rows get a downsampled preview automatically"),
-                                                html.Li("Interactive Plotly plots are slower than Matplotlib for large data"),
-                                                html.Li("Clear plot history periodically to free memory"),
+                                                html.Li(
+                                                    "Files >50 MB or >10k rows get a downsampled preview automatically"
+                                                ),
+                                                html.Li(
+                                                    "Interactive Plotly plots are slower than Matplotlib for large data"
+                                                ),
+                                                html.Li(
+                                                    "Clear plot history periodically to free memory"
+                                                ),
                                             ]
                                         ),
                                         title="Performance",
@@ -260,10 +289,16 @@ def _help_tab():
                                     dbc.AccordionItem(
                                         html.Ul(
                                             [
-                                                html.Li("Histogram — single-variable distributions"),
-                                                html.Li("Scatter — relationship between two variables"),
+                                                html.Li(
+                                                    "Histogram — single-variable distributions"
+                                                ),
+                                                html.Li(
+                                                    "Scatter — relationship between two variables"
+                                                ),
                                                 html.Li("Line — time series or ordered data"),
-                                                html.Li("Box / Violin — compare distributions across groups"),
+                                                html.Li(
+                                                    "Box / Violin — compare distributions across groups"
+                                                ),
                                                 html.Li("Heatmap — 2D matrix or correlation data"),
                                                 html.Li("Ternary — 3-component compositions"),
                                             ]
@@ -273,9 +308,13 @@ def _help_tab():
                                     dbc.AccordionItem(
                                         html.Ul(
                                             [
-                                                html.Li("Apply Publication Style in Quick Plot for paper-ready figures"),
+                                                html.Li(
+                                                    "Apply Publication Style in Quick Plot for paper-ready figures"
+                                                ),
                                                 html.Li("Export at 300 DPI from Export page"),
-                                                html.Li("Use SVG export for vector graphics in manuscripts"),
+                                                html.Li(
+                                                    "Use SVG export for vector graphics in manuscripts"
+                                                ),
                                             ]
                                         ),
                                         title="Publication figures",
