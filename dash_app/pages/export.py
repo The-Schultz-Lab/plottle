@@ -24,7 +24,7 @@ import base64
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from modules.io import save_data
+from plottle.io import save_data
 
 dash.register_page(__name__, path="/export", title="Export — Plottle", name="Export")
 

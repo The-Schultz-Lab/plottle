@@ -5,7 +5,7 @@ Upload a Gaussian, ORCA, or Molden output file to visualize:
   • Vibrational mode frequencies table
   • Animated normal mode displacements
 
-Uses modules.molecular.parsers and modules.molecular.atom_data.
+Uses plottle.molecular.parsers and plottle.molecular.atom_data.
 """
 
 import sys
@@ -23,8 +23,12 @@ from dash import Input, Output, State, callback, dash_table, dcc, html
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from modules.molecular.parsers import parse_vibrational_output
-from modules.molecular.atom_data import CPK_COLORS, CPK_RADII, ELEMENT_SYMBOLS
+from plottle.molecular.parsers import parse_vibrations as parse_vibrational_output
+from plottle.molecular.atom_data import atom_colors, atom_symbols, vdw_radii
+# Build symbol-keyed dicts matching the page's expected interface
+ELEMENT_SYMBOLS = {i: sym for i, sym in enumerate(atom_symbols)}
+CPK_COLORS = {sym: atom_colors[i] for i, sym in enumerate(atom_symbols)}
+CPK_RADII = {sym: vdw_radii[i] for i, sym in enumerate(atom_symbols)}
 
 dash.register_page(__name__, path="/plot-molecular-viz", title="Molecular Viz — Plottle", name="Molecular Viz")
 

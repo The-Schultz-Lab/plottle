@@ -24,7 +24,7 @@ from dash import Input, Output, State, callback, dash_table, dcc, html
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from modules.math import (
+from plottle.math import (
     anova_oneway,
     bonferroni_correction,
     calculate_statistics,
@@ -50,8 +50,8 @@ from modules.math import (
     tukey_hsd,
     wilcoxon_signed_rank,
 )
-from modules.peaks import compute_fwhm, find_peaks as pk_find_peaks, fit_multipeak, integrate_peaks
-from modules.signal import (
+from plottle.peaks import compute_fwhm, find_peaks as pk_find_peaks, fit_multipeak, integrate_peaks
+from plottle.signal import (
     baseline_als,
     baseline_polynomial,
     baseline_rolling_ball,

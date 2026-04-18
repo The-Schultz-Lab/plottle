@@ -24,9 +24,9 @@ from dash import Input, Output, State, callback, dash_table, dcc, html
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from modules.io import downsample_for_preview, load_data
-from modules.math import calculate_statistics, check_normality
-from modules.batch import batch_load_files, scan_directory
+from plottle.io import downsample_for_preview, load_data
+from plottle.math import calculate_statistics, check_normality
+from plottle.batch import batch_load_files, scan_directory
 
 dash.register_page(__name__, path="/data-upload", title="Data Upload — Plottle", name="Data Upload")
 

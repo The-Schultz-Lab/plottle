@@ -1,6 +1,6 @@
 """Plottle — Dash App Entry Point.
 
-Replaces the Streamlit ``modules/Home.py`` with a full Dash multi-page
+Replaces the Streamlit ``plottle/Home.py`` with a full Dash multi-page
 application that preserves all features and the NCCU dark colour scheme.
 
 Run
@@ -17,7 +17,7 @@ import sys
 import threading
 from pathlib import Path
 
-# Make repo root importable so ``modules.*`` resolve correctly
+# Make repo root importable so ``plottle.*`` resolve correctly
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 

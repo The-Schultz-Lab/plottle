@@ -3,7 +3,7 @@
 Left panel: dataset / column / plot-type selection + ~50 configuration controls
 Right panel: chart output (Plotly interactive or Matplotlib as PNG)
 
-All 26 plot types from modules.plotting are available:
+All 26 plot types from plottle.plotting are available:
   Matplotlib: histogram, line_plot, scatter_plot, bar_chart, heatmap,
               contour_plot, waterfall_plot, dual_axis_plot, broken_axis_plot,
               z_colored_scatter, bubble_chart, polar_plot, histogram_2d,
@@ -33,7 +33,7 @@ matplotlib.use("Agg")
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from modules.plotting import (
+from plottle.plotting import (
     bar_chart,
     box_plot,
     broken_axis_plot,
@@ -62,7 +62,7 @@ from modules.plotting import (
     waterfall_plot,
     z_colored_scatter,
 )
-from modules.annotations import apply_annotations
+from plottle.annotations import apply_annotations
 
 dash.register_page(__name__, path="/plot-basic", title="Quick Plot — Plottle", name="Quick Plot")
 

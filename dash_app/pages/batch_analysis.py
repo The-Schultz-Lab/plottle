@@ -16,8 +16,8 @@ from dash import Input, Output, State, callback, dash_table, dcc, html
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from modules.batch import batch_curve_fit, batch_peak_analysis, batch_statistics
-from modules.utils.user_settings import (
+from plottle.batch import batch_curve_fit, batch_peak_analysis, batch_statistics
+from plottle.utils.user_settings import (
     delete_preset,
     list_presets,
     load_preset,

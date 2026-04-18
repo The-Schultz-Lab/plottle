@@ -19,7 +19,7 @@ from dash import Input, Output, State, callback, dcc, html
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from modules.utils.user_settings import (
+from plottle.utils.user_settings import (
     delete_preset,
     get_config_path,
     get_defaults,
@@ -28,7 +28,7 @@ from modules.utils.user_settings import (
     save_defaults,
     save_preset,
 )
-from modules.utils.plot_config import COLOR_PALETTE_NAMES, _FONT_OPTIONS
+from plottle.utils.plot_config import COLOR_PALETTE_NAMES, _FONT_OPTIONS
 
 dash.register_page(__name__, path="/settings", title="Settings — Plottle", name="Settings")
 

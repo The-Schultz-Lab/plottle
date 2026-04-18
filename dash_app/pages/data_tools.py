@@ -25,16 +25,17 @@ from dash import Input, Output, State, callback, dash_table, dcc, html
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from modules.data_tools import (
+from plottle.data_tools import (
     add_formula_column,
-    fill_missing_values,
+    drop_nan,
+    fill_nan,
     filter_rows,
     melt_dataframe,
     merge_dataframes,
     normalize_column,
     pivot_dataframe,
     resample_dataframe,
-    rolling_aggregate,
+    rolling_transform,
     sort_dataframe,
     transpose_dataframe,
 )
@@ -397,14 +398,17 @@ def apply_operation(
             result_df = merge_dataframes(df, right_df, how=mrg_how or "inner", on=mrg_on)
             save_name = mrg_sname or "merged"
         elif "nan" in triggered:
-            result_df = fill_missing_values(df, method=nan_action or "drop_rows", fill_value=float(nan_val or 0))
+            if (nan_action or "drop_rows") == "drop_rows":
+                result_df = drop_nan(df)
+            else:
+                result_df = fill_nan(df, method=nan_action or "mean")
             save_name = nan_sname or "nan_handled"
         elif "resample" in triggered:
             result_df = resample_dataframe(df, new_size=int(rs_size or 100), method=rs_method or "linear")
             save_name = rs_sname or "resampled"
         elif "rolling" in triggered:
-            result_df = rolling_aggregate(df, column=roll_col, window=int(roll_win or 5),
-                                          agg=roll_agg or "mean", new_col_name=roll_name or "rolling")
+            cols = [roll_col] if roll_col and roll_col in df.columns else df.select_dtypes("number").columns.tolist()
+            result_df = rolling_transform(df, columns=cols, operation=f"rolling_{roll_agg or 'mean'}", window=int(roll_win or 5))
             save_name = roll_sname or "rolling_result"
 
     except Exception as e:

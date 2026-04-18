@@ -22,7 +22,7 @@ matplotlib.use("Agg")
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from modules.plotting import (
+from plottle.plotting import (
     bar_chart, box_plot, contour_plot, heatmap, histogram,
     line_plot, scatter_plot, scatter_with_regression,
     distribution_plot,

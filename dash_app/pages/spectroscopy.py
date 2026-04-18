@@ -20,10 +20,9 @@ from dash import Input, Output, State, callback, dcc, html
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from dash_app import state
-from modules.spectroscopy import (
+from plottle.spectroscopy import (
     absorbance_to_transmittance,
-    apply_atr_correction,
-    apply_baseline_correction,
+    atr_correction,
     beer_lambert,
     calibrate_ppm_axis,
     find_mz_peaks,
@@ -31,9 +30,17 @@ from modules.spectroscopy import (
     remove_cosmic_rays,
     spectral_subtraction,
     transmittance_to_absorbance,
-    uv_vis_baseline_subtraction,
 )
-from modules.nist import fetch_ir_spectrum, get_compound_url
+from plottle.signal import baseline_als, baseline_polynomial, baseline_rolling_ball
+
+# ATR crystal → (n_atr, n_sample) refractive index presets
+_ATR_CRYSTALS = {
+    "ZnSe": (2.4, 1.5),
+    "Diamond": (2.4, 1.5),
+    "Germanium": (4.0, 1.5),
+    "AMTIR": (2.5, 1.5),
+}
+from plottle.nist import fetch_ir_spectrum, get_compound_url
 
 dash.register_page(__name__, path="/plot-spectroscopy", title="Spectroscopy — Plottle", name="Spectroscopy")
 
@@ -196,7 +203,8 @@ def ir_apply(apply_n, nist_n, ds_name, xcol, ycol, sub_tab, crystal, angle, bg_d
         if sub_tab == "ir-display":
             processed = y
         elif sub_tab == "ir-atr":
-            processed = apply_atr_correction(x, y, crystal=crystal or "ZnSe", angle=float(angle or 45))
+            n_atr, n_sample = _ATR_CRYSTALS.get(crystal or "ZnSe", (2.4, 1.5))
+            processed = atr_correction(x, y, n_atr=n_atr, angle_deg=float(angle or 45), n_sample=n_sample)
         elif sub_tab == "ir-sub":
             bg_df = _get_df(bg_ds)
             if bg_df is None:
@@ -206,7 +214,13 @@ def ir_apply(apply_n, nist_n, ds_name, xcol, ycol, sub_tab, crystal, angle, bg_d
         elif sub_tab == "ir-cosmic":
             processed = remove_cosmic_rays(y)
         elif sub_tab == "ir-baseline":
-            processed = apply_baseline_correction(x, y, method=bl_method or "polynomial", order=int(bl_order or 2))
+            _bl_method = bl_method or "polynomial"
+            if _bl_method == "rolling_ball":
+                processed, _ = baseline_rolling_ball(y)
+            elif _bl_method == "als":
+                processed, _ = baseline_als(y)
+            else:
+                processed, _ = baseline_polynomial(y, x, degree=int(bl_order or 2))
         else:
             processed = y
     except Exception as e:
@@ -275,7 +289,7 @@ def nmr_apply(n, ds_name, xcol, ycol, sub_tab, ref_ppm, int_min, int_max):
             result = integrate_nmr_regions(x, y, regions=regions)
             return html.Pre(str(result), className="result-box")
         elif sub_tab == "nmr-fft":
-            from modules.signal import fft as sig_fft
+            from plottle.signal import fft as sig_fft
             fft_result = sig_fft(y)
             freqs = fft_result.get("frequencies", np.arange(len(y)))
             mags = fft_result.get("magnitudes", np.zeros(len(y)))
@@ -341,7 +355,7 @@ def uv_apply(disp_n, bl_n, base_n, ds_name, xcol, ycol, eps, path):
             result = beer_lambert(y, epsilon=float(eps or 1000), path_length=float(path or 1.0))
             return html.Pre(str(result), className="result-box")
         if triggered == "uv-base-btn":
-            y = uv_vis_baseline_subtraction(x, y)
+            y, _ = baseline_polynomial(y, x, degree=1)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=x, y=y, mode="lines", name="UV-Vis", line={"color": "#e0a3a3"}))
         fig.update_layout(template="plotly_dark", xaxis_title="Wavelength (nm)",
