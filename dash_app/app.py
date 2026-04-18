@@ -23,7 +23,7 @@ sys.path.insert(0, str(_REPO_ROOT))
 
 import dash
 import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, State, dcc, html
+from dash import Dash, Input, Output, dcc, html
 
 # ── App instance ──────────────────────────────────────────────────────────────
 
@@ -155,28 +155,6 @@ sidebar = html.Div(
     id="sidebar",
 )
 
-# ── Exit confirmation modal ───────────────────────────────────────────────────
-
-exit_modal = dbc.Modal(
-    [
-        dbc.ModalHeader(dbc.ModalTitle("Shut down Plottle?")),
-        dbc.ModalBody(
-            "This will stop the server. You will need to re-run "
-            "launch_dash.bat to start it again."
-        ),
-        dbc.ModalFooter(
-            [
-                dbc.Button("Cancel", id="exit-cancel-btn", color="secondary", className="me-2"),
-                dbc.Button("Shut Down", id="exit-confirm-btn", color="danger"),
-            ]
-        ),
-    ],
-    id="exit-modal",
-    is_open=False,
-    centered=True,
-    backdrop="static",
-)
-
 # ── Layout ────────────────────────────────────────────────────────────────────
 
 app.layout = html.Div(
@@ -190,10 +168,6 @@ app.layout = html.Div(
             duration=3000,
             style={"position": "fixed", "top": "1rem", "right": "1rem", "zIndex": 9999},
         ),
-        exit_modal,
-        # Invisible placeholder — the confirm callback writes "shutdown" here
-        # so the browser shows a message before the process exits.
-        html.Div(id="exit-shutdown-placeholder", style={"display": "none"}),
         sidebar,
         html.Main(
             dash.page_container,
@@ -205,36 +179,43 @@ app.layout = html.Div(
 )
 
 
-# ── Exit callbacks ────────────────────────────────────────────────────────────
+# ── Shutdown route ────────────────────────────────────────────────────────────
+
+_SHUTDOWN_HTML = """<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Plottle — stopped</title>
+<style>
+  body { font-family: 'Nunito', 'Segoe UI', sans-serif; display: flex;
+         align-items: center; justify-content: center; height: 100vh;
+         margin: 0; background: #1a1a2e; color: #ccc; }
+  .box { text-align: center; }
+  .box h2 { color: #e0a3a3; margin-bottom: 0.4rem; }
+  .box p  { color: #888; font-size: 0.95rem; }
+</style>
+</head><body><div class="box">
+<h2>Plottle has stopped</h2>
+<p>The server has shut down. You can close this tab.</p>
+</div></body></html>"""
+
+
+@app.server.route("/shutdown")
+def _shutdown_page():
+    """Serve a goodbye page then kill the process."""
+    from flask import Response
+    threading.Timer(0.6, lambda: os._exit(0)).start()
+    return Response(_SHUTDOWN_HTML, mimetype="text/html")
+
+
+# ── Exit callback ─────────────────────────────────────────────────────────────
 
 @app.callback(
-    Output("exit-modal", "is_open"),
+    Output("url", "pathname"),
     Input("exit-btn", "n_clicks"),
-    Input("exit-cancel-btn", "n_clicks"),
-    State("exit-modal", "is_open"),
     prevent_initial_call=True,
 )
-def toggle_exit_modal(open_n, cancel_n, is_open):
-    """Open the modal when Exit is clicked; close it when Cancel is clicked."""
-    ctx = dash.callback_context
-    triggered = ctx.triggered[0]["prop_id"].split(".")[0]
-    if triggered == "exit-btn":
-        return True
-    if triggered == "exit-cancel-btn":
-        return False
-    return is_open
-
-
-@app.callback(
-    Output("exit-shutdown-placeholder", "children"),
-    Input("exit-confirm-btn", "n_clicks"),
-    prevent_initial_call=True,
-)
-def shutdown_server(n_clicks):
-    """Schedule process exit after a short delay so the response is sent first."""
-    if n_clicks:
-        threading.Timer(0.4, lambda: os._exit(0)).start()
-    return dash.no_update
+def on_exit(n_clicks):
+    """Redirect to /shutdown, which serves a goodbye page then kills the process."""
+    return "/shutdown"
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
