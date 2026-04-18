@@ -13,7 +13,7 @@ Features
 
 Examples
 --------
->>> from modules.math import calculate_mean, fit_polynomial
+>>> from plottle.math import calculate_mean, fit_polynomial
 >>> mean_value = calculate_mean(data)
 >>> coefficients = fit_polynomial(x, y, degree=2)
 """

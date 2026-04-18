@@ -39,7 +39,7 @@ _GALLERY_DIR.mkdir(parents=True, exist_ok=True)
 
 sys.path.insert(0, str(_ROOT))
 
-from modules.plotting import (  # noqa: E402
+from plottle.plotting import (  # noqa: E402
     histogram,
     line_plot,
     scatter_plot,

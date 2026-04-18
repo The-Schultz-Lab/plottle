@@ -13,5 +13,5 @@ if [ ! -d ".venv" ]; then
 fi
 
 source .venv/bin/activate
-streamlit run modules/Home.py
+streamlit run plottle/Home.py
 read -r -p "Press Enter to close..."

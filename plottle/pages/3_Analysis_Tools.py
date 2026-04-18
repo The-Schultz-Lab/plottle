@@ -1,7 +1,7 @@
 """Analysis Tools Page.
 
 Statistical analysis, curve fitting, optimization, and linear algebra
-operations on loaded datasets, using functions from modules.math.
+operations on loaded datasets, using functions from plottle.math.
 
 Tabs
 ----
@@ -21,13 +21,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from modules.peaks import (
+from plottle.peaks import (
     find_peaks as pk_find_peaks,
     integrate_peaks,
     compute_fwhm,
     fit_multipeak,
 )
-from modules.signal import (
+from plottle.signal import (
     smooth_moving_average,
     smooth_savitzky_golay,
     smooth_gaussian,
@@ -45,7 +45,7 @@ from modules.signal import (
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from modules.math import (
+from plottle.math import (
     calculate_statistics,
     check_normality,
     fit_distribution,
@@ -72,7 +72,7 @@ from modules.math import (
     spearman_correlation,
     chi_square_independence,
 )
-from modules.utils import (
+from plottle.utils import (
     initialize_session_state,
     get_dataset,
     add_analysis_result,

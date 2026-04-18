@@ -15,7 +15,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from modules.plotting import (
+from plottle.plotting import (
     histogram,
     line_plot,
     scatter_plot,
@@ -30,12 +30,12 @@ from modules.plotting import (
     interactive_heatmap,
     interactive_3d_surface,
 )
-from modules.utils import (
+from plottle.utils import (
     initialize_session_state,
     get_dataset,
     get_session_summary,
 )
-from modules.utils.plot_config import PLOT_TYPES
+from plottle.utils.plot_config import PLOT_TYPES
 
 initialize_session_state()
 

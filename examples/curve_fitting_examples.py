@@ -16,8 +16,8 @@ matplotlib.use("Agg")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.math import fit_linear, fit_polynomial, fit_exponential, fit_custom
-from modules.plotting import scatter_plot, save_figure
+from plottle.math import fit_linear, fit_polynomial, fit_exponential, fit_custom
+from plottle.plotting import scatter_plot, save_figure
 
 OUTPUT_DIR = Path(__file__).parent / "plots"
 OUTPUT_DIR.mkdir(exist_ok=True)

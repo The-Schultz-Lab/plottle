@@ -36,6 +36,7 @@ dependencies = [
     "streamlit>=1.25.0",
     "openpyxl>=3.1.0",
     "PyYAML>=6.0",
+    "requests>=2.28.0",
 ]
 
 [project.optional-dependencies]
@@ -69,7 +70,7 @@ py-modules = ["cli"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["modules*"]
+include = ["plottle*"]
 
 [tool.ruff]
 line-length = 100
@@ -80,8 +81,8 @@ select = ["E", "F", "W"]
 ignore = []
 
 [tool.ruff.lint.per-file-ignores]
-"modules/pages/*.py" = ["E402"]
-"modules/Home.py" = ["E402"]
+"plottle/pages/*.py" = ["E402"]
+"plottle/Home.py" = ["E402"]
 
 [tool.black]
 line-length = 100
@@ -95,8 +96,8 @@ explicit_package_bases = true
 
 [tool.coverage.run]
 omit = [
-    "modules/Home.py",
-    "modules/pages/*",
+    "plottle/Home.py",
+    "plottle/pages/*",
 ]
 
 [tool.pytest.ini_options]

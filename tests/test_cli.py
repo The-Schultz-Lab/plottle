@@ -68,7 +68,7 @@ class TestBasicCLI:
         """Test that --help displays help message."""
         result = run_cli('--help')
         assert result.returncode == 0
-        assert 'Plottle' in result.stdout
+        assert 'Plotting Helper' in result.stdout
         assert 'plot' in result.stdout
         assert 'stats' in result.stdout
 

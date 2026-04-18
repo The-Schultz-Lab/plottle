@@ -6,7 +6,7 @@ management, and styling utilities.
 
 Examples
 --------
->>> from modules.plotting import line_plot, histogram, save_figure
+>>> from plottle.plotting import line_plot, histogram, save_figure
 >>> fig, ax = line_plot(x, y, xlabel='Time (s)', ylabel='Temperature (K)')
 >>> save_figure(fig, 'output.png', dpi=300)
 """

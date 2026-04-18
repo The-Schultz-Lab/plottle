@@ -1,4 +1,4 @@
-# GUI Tutorial — Plottle
+# GUI Tutorial — Plotting Helper
 
 This guide walks through the Streamlit app page by page, then shows a complete end-to-end
 workflow: upload data → analyze → plot → export.

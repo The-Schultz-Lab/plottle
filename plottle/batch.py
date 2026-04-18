@@ -29,14 +29,14 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from modules.io import load_data
-from modules.math import (
+from plottle.io import load_data
+from plottle.math import (
     calculate_statistics,
     fit_exponential,
     fit_linear,
     fit_polynomial,
 )
-from modules.peaks import compute_fwhm, find_peaks
+from plottle.peaks import compute_fwhm, find_peaks
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 

@@ -19,7 +19,7 @@ import shutil
 import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from modules.io import (
+from plottle.io import (
     load_pickle,
     save_pickle,
     load_numpy,

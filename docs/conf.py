@@ -3,7 +3,7 @@
 import os
 import sys
 
-# Point Sphinx to the repo root so autodoc can import modules.*
+# Point Sphinx to the repo root so autodoc can import plottle.*
 sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -------------------------------------------------------

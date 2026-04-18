@@ -2,11 +2,11 @@
 
 ## Overview
 
-The Plottle CLI provides a powerful command-line interface for scientific data visualization and analysis. This guide covers all commands, options, and usage examples.
+The Plotting Helper CLI provides a powerful command-line interface for scientific data visualization and analysis. This guide covers all commands, options, and usage examples.
 
 ## Installation
 
-The CLI is included in the Plottle package. No additional installation is required.
+The CLI is included in the Plotting Helper package. No additional installation is required.
 
 ## Basic Usage
 
@@ -419,7 +419,7 @@ python cli.py --examples
 - **Solution**: Use `python3` instead, or ensure Python is in your PATH
 
 **Problem**: "Module not found: modules.io"
-- **Solution**: Run from the plottle directory, not the examples/ directory
+- **Solution**: Run from the plotting-helper directory, not the examples/ directory
 
 **Problem**: Plot files are too large
 - **Solution**: Reduce `--dpi` value (e.g., `--dpi 150` instead of default 300)
@@ -441,4 +441,4 @@ python cli.py --examples
 
 **Version**: 1.0.0
 **Last Updated**: 2026-02-12
-**Project**: Plottle
+**Project**: Plotting Helper - CHEM 5350

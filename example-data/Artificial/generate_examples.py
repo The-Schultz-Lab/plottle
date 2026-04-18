@@ -1,4 +1,4 @@
-"""Generate example datasets for every plot type in the Plottle app.
+"""Generate example datasets for every plot type in the Plotting Helper app.
 
 Run once from the example-data/Artificial/ directory (or anywhere — paths are
 resolved relative to this file):

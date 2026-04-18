@@ -16,8 +16,8 @@ matplotlib.use("Agg")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.math import calculate_statistics
-from modules.plotting import line_plot, apply_publication_style, save_figure, get_color_palette
+from plottle.math import calculate_statistics
+from plottle.plotting import line_plot, apply_publication_style, save_figure, get_color_palette
 
 OUTPUT_DIR = Path(__file__).parent / "plots"
 OUTPUT_DIR.mkdir(exist_ok=True)

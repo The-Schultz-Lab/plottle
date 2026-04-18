@@ -16,8 +16,8 @@ matplotlib.use("Agg")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.math import calculate_statistics, check_normality
-from modules.plotting import histogram, save_figure
+from plottle.math import calculate_statistics, check_normality
+from plottle.plotting import histogram, save_figure
 
 OUTPUT_DIR = Path(__file__).parent / "plots"
 OUTPUT_DIR.mkdir(exist_ok=True)

@@ -15,8 +15,8 @@ matplotlib.use("Agg")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.math import minimize_function, find_roots
-from modules.plotting import line_plot, save_figure
+from plottle.math import minimize_function, find_roots
+from plottle.plotting import line_plot, save_figure
 
 OUTPUT_DIR = Path(__file__).parent / "plots"
 OUTPUT_DIR.mkdir(exist_ok=True)

@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -22,26 +22,26 @@ jobs:
         run: pip install ruff mypy types-PyYAML types-requests
 
       - name: ruff check
-        run: ruff check modules/ cli.py __init__.py
+        run: ruff check plottle/ cli.py __init__.py
 
       - name: ruff format check
-        run: ruff format --check modules/ cli.py __init__.py
+        run: ruff format --check plottle/ cli.py __init__.py
 
       - name: mypy check
         run: |
           mypy \
-            modules/io.py \
-            modules/math.py \
-            modules/plotting.py \
-            modules/signal.py \
-            modules/peaks.py \
-            modules/data_tools.py \
-            modules/annotations.py \
-            modules/batch.py \
-            modules/report.py \
-            modules/plugin_loader.py \
-            modules/spectroscopy.py \
-            modules/nist.py \
+            plottle/io.py \
+            plottle/math.py \
+            plottle/plotting.py \
+            plottle/signal.py \
+            plottle/peaks.py \
+            plottle/data_tools.py \
+            plottle/annotations.py \
+            plottle/batch.py \
+            plottle/report.py \
+            plottle/plugin_loader.py \
+            plottle/spectroscopy.py \
+            plottle/nist.py \
             cli.py \
             --ignore-missing-imports --no-strict-optional --explicit-package-bases
 
@@ -49,10 +49,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -79,13 +79,13 @@ jobs:
             tests/test_report.py \
             tests/test_plugin_loader.py \
             tests/test_nist.py \
-            --cov=modules \
+            --cov=plottle \
             --cov-report=xml \
             --cov-report=term-missing \
             -v
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage.xml

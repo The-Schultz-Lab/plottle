@@ -22,8 +22,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from modules.utils import initialize_session_state
-from modules.utils.session_state import (
+from plottle.utils import initialize_session_state
+from plottle.utils.session_state import (
     get_current_dataset,
     get_session_summary,
     save_session_to_file,
@@ -281,7 +281,7 @@ st.markdown(
 
 # Import report generator lazily to avoid hard dependency at module load
 try:
-    from modules.report import generate_pdf_report as _gen_pdf
+    from plottle.report import generate_pdf_report as _gen_pdf
 
     _report_available = True
 except ImportError:

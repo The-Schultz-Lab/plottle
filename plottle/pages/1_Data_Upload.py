@@ -83,9 +83,9 @@ _EXAMPLES = {
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from modules.io import load_data  # noqa: E402
-from modules.math import calculate_statistics, check_normality  # noqa: E402
-from modules.utils import (  # noqa: E402
+from plottle.io import load_data  # noqa: E402
+from plottle.math import calculate_statistics, check_normality  # noqa: E402
+from plottle.utils import (  # noqa: E402
     initialize_session_state,
     add_dataset,
     get_dataset,
@@ -94,8 +94,8 @@ from modules.utils import (  # noqa: E402
     display_dataset_card,
     display_data_preview,
 )
-from modules.batch import scan_directory, batch_load_files  # noqa: E402
-from modules.io import downsample_for_preview  # noqa: E402
+from plottle.batch import scan_directory, batch_load_files  # noqa: E402
+from plottle.io import downsample_for_preview  # noqa: E402
 
 _LARGE_FILE_BYTES = 50 * 1024 * 1024  # 50 MB — warn above this
 _PREVIEW_MAX_ROWS = 10_000  # downsample preview above this
@@ -147,7 +147,7 @@ with tab1:
         try:
             with st.spinner(f"Loading {uploaded_file.name}..."):
                 # Save uploaded file to temp location
-                temp_dir = Path(tempfile.gettempdir()) / "plottle"
+                temp_dir = Path(tempfile.gettempdir()) / "plotting_helper"
                 temp_dir.mkdir(exist_ok=True)
                 temp_path = temp_dir / uploaded_file.name
 

@@ -14,13 +14,13 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from modules.utils.session_state import initialize_session_state
-from modules.batch import (
+from plottle.utils.session_state import initialize_session_state
+from plottle.batch import (
     batch_statistics,
     batch_curve_fit,
     batch_peak_analysis,
 )
-from modules.utils.user_settings import (
+from plottle.utils.user_settings import (
     list_workflows,
     save_workflow,
     load_workflow,

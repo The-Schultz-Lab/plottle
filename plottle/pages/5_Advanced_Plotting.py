@@ -25,14 +25,14 @@ import plotly.graph_objects as go
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from modules.plotting import (
+from plottle.plotting import (
     interactive_histogram,
     interactive_scatter,
     interactive_line,
     interactive_heatmap,
     interactive_3d_surface,
 )
-from modules.utils import (
+from plottle.utils import (
     initialize_session_state,
     get_dataset,
     get_session_summary,

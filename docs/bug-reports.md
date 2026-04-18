@@ -14,6 +14,39 @@
 
 ## Unresolved
 
+────────────────────────── Traceback (most recent call last) ───────────────────────────
+  C:\Users\schul\Documents\local-code-dir\repos-PUBLIC\Plottle\.venv\Lib\site-packages
+  \streamlit\runtime\scriptrunner\exec_code.py:129 in exec_func_with_error_handling
+
+  C:\Users\schul\Documents\local-code-dir\repos-PUBLIC\Plottle\.venv\Lib\site-packages
+  \streamlit\runtime\scriptrunner\script_runner.py:689 in code_to_exec
+
+  C:\Users\schul\Documents\local-code-dir\repos-PUBLIC\plottle\modules\Home.py:393 in
+  <module>
+
+    390
+    391 # ── Execute the active page ─────────────────────────────────────────────────
+    392
+  ❱ 393 pg.run()
+    394
+
+  C:\Users\schul\Documents\local-code-dir\repos-PUBLIC\Plottle\.venv\Lib\site-packages
+  \streamlit\navigation\page.py:380 in run
+
+  C:\Users\schul\Documents\local-code-dir\repos-PUBLIC\plottle\modules\pages\2_Quick_P
+  lot.py:1468 in <module>
+
+    1465 │   │   # Handle newly selected points
+    1466 │   │   if _event and hasattr(_event, "selection"):
+    1467 │   │   │   for _pt in _event.selection.points:
+  ❱ 1468 │   │   │   │   _ann = {"x": _pt.x, "y": _pt.y}
+    1469 │   │   │   │   if _ann not in st.session_state.qp_annotations:
+    1470 │   │   │   │   │   st.session_state.qp_annotations.append(_ann)
+    1471 │   except TypeError:
+────────────────────────────────────────────────────────────────────────────────────────
+AttributeError: 'dict' object has no attribute 'x'
+
+
 <!-- Add new bugs here. One bullet per bug. Helpful to include:
      - What you did (the action or scenario that triggered it)
      - What happened (the actual behavior)

@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from modules.data_tools import (
+from plottle.data_tools import (
     add_formula_column,
     drop_nan,
     fill_nan,
@@ -55,9 +55,9 @@ def long_df():
     """Long-format DataFrame for pivot testing."""
     return pd.DataFrame(
         {
-            "id":    ["r1", "r1", "r2", "r2"],
-            "key":   ["A",  "B",  "A",  "B"],
-            "value": [10,   20,   30,   40],
+            "id": ["r1", "r1", "r2", "r2"],
+            "key": ["A", "B", "A", "B"],
+            "value": [10, 20, 30, 40],
         }
     )
 
@@ -68,8 +68,8 @@ def wide_df():
     return pd.DataFrame(
         {
             "sample": ["s1", "s2"],
-            "A":      [10,   30],
-            "B":      [20,   40],
+            "A": [10, 30],
+            "B": [20, 40],
         }
     )
 
@@ -114,9 +114,7 @@ class TestAddFormulaColumn:
 
     def test_constants_available(self, simple_df):
         result = add_formula_column(simple_df, "pi_col", "x * pi")
-        np.testing.assert_allclose(
-            result["pi_col"].values, simple_df["x"].values * math.pi
-        )
+        np.testing.assert_allclose(result["pi_col"].values, simple_df["x"].values * math.pi)
 
 
 # ─── normalize_column ─────────────────────────────────────────────────────────
@@ -423,9 +421,7 @@ class TestResampleDataframe:
         np.testing.assert_allclose(result["y"].iloc[mid_idx], 6.0, atol=0.1)
 
     def test_custom_x_range(self, simple_df):
-        result = resample_dataframe(
-            simple_df, "x", ["y"], n_points=5, x_min=2.0, x_max=4.0
-        )
+        result = resample_dataframe(simple_df, "x", ["y"], n_points=5, x_min=2.0, x_max=4.0)
         assert result["x"].min() == pytest.approx(2.0)
         assert result["x"].max() == pytest.approx(4.0)
 

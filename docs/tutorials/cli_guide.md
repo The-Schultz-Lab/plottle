@@ -1,4 +1,4 @@
-# CLI Tutorial — Plottle
+# CLI Tutorial — Plotting Helper
 
 This guide walks through all five CLI commands with copy-pasteable examples. No GUI or
 Jupyter required — everything runs from a terminal.

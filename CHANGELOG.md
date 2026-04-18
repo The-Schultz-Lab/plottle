@@ -6,30 +6,6 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [2.0.1] - 2026-04-08
-
-### Fixed
-
-- Session save/load: wrap DataFrame JSON string in `io.StringIO` before passing to
-  `pd.read_json()`, fixing a `FileNotFoundError` on pandas 2.x where a bare string
-  argument is now treated as a file path rather than inline content
-  (`modules/utils/session_state.py`)
-
-### Changed
-
-- Added macOS one-click setup and launch scripts (`setup.command`, `launch.command`)
-- Updated `launch.bat` to check for the virtual environment and print a helpful error
-  if it is missing
-- README: added platform-specific setup/launch instructions, PyPI badge, and updated
-  programmatic import examples to use `plottle.*` namespace
-- `pyproject.toml`: bumped minimum `setuptools` to 78.0, normalized `license` field
-  to PEP 639 format, corrected author email, added `build`/`twine` dev dependencies
-  and changelog URL
-- `modules/Home.py`: use `.resolve()` for path construction (improves symlink and
-  working-directory robustness); moved NCCU wings logo to sidebar
-
----
-
 ## [2.0.0] - 2026-03-17
 
 ### Added
@@ -38,7 +14,7 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - 12 new hypothesis-testing functions: one-sample/two-sample/paired t-tests, Mann-Whitney U,
   Wilcoxon signed-rank, Kruskal-Wallis, one-way ANOVA, Tukey HSD, Bonferroni correction,
   Pearson/Spearman correlation, chi-square independence
-- Two-way ANOVA (`anova_twoway`) via optional `statsmodels` dependency
+- Two-way ANOVA (`anova_twoway`) via optional `statsmodels` dependency (DEC-008)
 - Effect size display (Cohen's d with Small/Medium/Large interpretation) in the GUI
 
 **Signal Processing (`modules/signal.py` — new module)**
@@ -231,5 +207,5 @@ Initial development release. Stages 0–6 complete (foundation, I/O, math, basic
 
 ---
 
-[1.0.0]: https://github.com/The-Schultz-Lab/plottle/releases/tag/v1.0.0
-[0.1.0]: https://github.com/The-Schultz-Lab/plottle/releases/tag/v0.1.0
+[1.0.0]: https://github.com/NCCU-Schultz-Lab/plottle-devs/releases/tag/v1.0.0
+[0.1.0]: https://github.com/NCCU-Schultz-Lab/plottle-devs/releases/tag/v0.1.0

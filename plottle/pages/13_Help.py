@@ -6,7 +6,7 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from modules.utils.session_state import initialize_session_state
+from plottle.utils.session_state import initialize_session_state
 
 initialize_session_state()
 

@@ -20,8 +20,8 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from modules.utils import initialize_session_state
-from modules.utils.user_settings import (
+from plottle.utils import initialize_session_state
+from plottle.utils.user_settings import (
     get_config_path,
     get_defaults,
     save_defaults,
@@ -30,7 +30,7 @@ from modules.utils.user_settings import (
     load_preset,
     delete_preset,
 )
-from modules.utils.plot_config import COLOR_PALETTE_NAMES, _FONT_OPTIONS
+from plottle.utils.plot_config import COLOR_PALETTE_NAMES, _FONT_OPTIONS
 
 initialize_session_state()
 
