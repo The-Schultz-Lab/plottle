@@ -9,7 +9,7 @@ workflow: upload data → analyze → plot → export.
 
 ```bash
 # Activate your virtual environment first, then:
-streamlit run modules/Home.py
+streamlit run plottle/Home.py
 ```
 
 Open `http://localhost:8501` in your browser. The sidebar on the left lists all pages.

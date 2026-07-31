@@ -15,14 +15,6 @@ import json
 from pathlib import Path
 import sys
 
-# `tomllib` entered the stdlib in Python 3.11, but Plottle supports 3.9+.
-# Without this fallback the whole page raises ModuleNotFoundError on 3.9/3.10
-# while every other page works — see G-013 / audit A-04.
-try:
-    import tomllib
-except ModuleNotFoundError:  # Python 3.9 / 3.10
-    import tomli as tomllib
-
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -38,6 +30,16 @@ from plottle.utils.user_settings import (
     delete_preset,
 )
 from plottle.utils.plot_config import COLOR_PALETTE_NAMES, _FONT_OPTIONS
+from plottle.utils.theming import (
+    STREAMLIT_DEFAULTS,
+    read_theme,
+    write_theme,
+)
+
+# Aliased: this page shows two different config files, and an unaliased import
+# would shadow user_settings.get_config_path() (config.json) with the theming
+# one (config.toml), silently repointing the "Config File" section below.
+from plottle.utils.theming import get_config_path as get_theme_config_path
 
 initialize_session_state()
 
@@ -52,61 +54,17 @@ st.caption(
 # Section 0 — Theme
 # ══════════════════════════════════════════════════════════════════════════════
 
-_STREAMLIT_CONFIG = Path(__file__).parent.parent.parent / ".streamlit" / "config.toml"
-
-_THEME_DEFAULTS = {
-    "base": "light",
-    "primaryColor": "#1f77b4",
-    "backgroundColor": "#ffffff",
-    "secondaryBackgroundColor": "#f0f2f6",
-    "textColor": "#262730",
-}
-
-
-def _read_theme() -> dict:
-    """Read the [theme] section from config.toml."""
-    if not _STREAMLIT_CONFIG.exists():
-        return dict(_THEME_DEFAULTS)
-    try:
-        with open(_STREAMLIT_CONFIG, "rb") as fh:
-            data = tomllib.load(fh)
-        t = data.get("theme", {})
-        return {**_THEME_DEFAULTS, **t}
-    except Exception:
-        return dict(_THEME_DEFAULTS)
-
-
-def _write_theme(theme: dict) -> None:
-    """Write the [theme] section to config.toml, preserving other sections."""
-    if not _STREAMLIT_CONFIG.exists():
-        return
-    try:
-        with open(_STREAMLIT_CONFIG, "rb") as fh:
-            data = tomllib.load(fh)
-    except Exception:
-        data = {}
-    data["theme"] = theme
-    lines = ["# Plottle — Streamlit configuration\n"]
-    for section, values in data.items():
-        lines.append(f"\n[{section}]\n")
-        if isinstance(values, dict):
-            for k, v in values.items():
-                if isinstance(v, str):
-                    lines.append(f'{k} = "{v}"\n')
-                elif isinstance(v, bool):
-                    lines.append(f"{k} = {'true' if v else 'false'}\n")
-                else:
-                    lines.append(f"{k} = {v}\n")
-    _STREAMLIT_CONFIG.write_text("".join(lines), encoding="utf-8")
-
-
 st.markdown("## Theme")
 st.markdown(
     "Choose a base theme and optionally customize colours. "
     "Click **Save theme** then **restart the app** for changes to take effect."
 )
+st.caption(
+    f"Theme is saved to `{get_theme_config_path()}` — the location Streamlit reads when "
+    "launched from this directory."
+)
 
-_cur = _read_theme()
+_cur = read_theme()
 
 with st.form("theme_form"):
     _tc1, _tc2 = st.columns(2)
@@ -141,21 +99,41 @@ with st.form("theme_form"):
 
     _theme_submitted = st.form_submit_button("Save theme", type="primary")
 
+
+def _save_theme(theme: dict, success_message: str) -> None:
+    """Write a theme and report what actually happened.
+
+    The previous implementation returned silently when config.toml was missing --
+    the default for every pip-installed user -- while still printing a success
+    message. See audit A-18.
+    """
+    try:
+        written = write_theme(theme)
+    except OSError as exc:
+        st.error(
+            f"Could not write the theme: {exc}\n\n"
+            f"Plottle tried to write `{get_theme_config_path()}`. If that directory is "
+            "read-only, launch Plottle from a directory you can write to, or create "
+            "`.streamlit/config.toml` there yourself."
+        )
+        return
+    st.success(f"{success_message} Saved to `{written}` — restart the app to apply.")
+
+
 if _theme_submitted:
-    _write_theme(
+    _save_theme(
         {
             "base": _base,
             "primaryColor": _primary,
             "backgroundColor": _bg,
             "secondaryBackgroundColor": _sbg,
             "textColor": _text,
-        }
+        },
+        "Theme saved.",
     )
-    st.success("Theme saved to .streamlit/config.toml. Restart the app to apply.")
 
 if st.button("Reset theme to Streamlit default"):
-    _write_theme({"base": "light"})
-    st.success("Theme reset. Restart the app to apply.")
+    _save_theme(dict(STREAMLIT_DEFAULTS), "Theme reset to Streamlit defaults.")
 
 st.markdown("---")
 

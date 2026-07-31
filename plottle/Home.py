@@ -9,7 +9,7 @@ Navigation Structure
 Home
 Data Upload
 Plot
-  Basic         — Quick Plot (26 plot types, Matplotlib/Seaborn/Plotly)
+  Basic         — Quick Plot (27 plot types, Matplotlib/Seaborn/Plotly)
   Multiplot     — Multi-Plot Dashboard (grid layouts, axis sharing)
   Advanced
     ↳ Advanced Plotting  — Seaborn statistical + Plotly interactive
@@ -48,6 +48,7 @@ _NCCU_WINGS = _ASSETS_DIR / "nccu-wings.png"
 
 from plottle import __version__  # noqa: E402
 from plottle.utils import initialize_session_state, get_session_summary  # noqa: E402
+from plottle.utils.theming import app_css  # noqa: E402
 
 try:
     from PIL import Image as _PILImage
@@ -73,43 +74,12 @@ st.set_page_config(
     },
 )
 
-# ── App-wide font (Nunito — closest free alternative to Avenir) ───────────────
-st.markdown(
-    """
-    <link
-        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap"
-        rel="stylesheet"
-    >
-    <style>
-    html, body, [class*="css"] {
-        font-family: 'Nunito', 'Avenir Next', 'Avenir', 'Segoe UI',
-                     'Helvetica Neue', Arial, sans-serif !important;
-    }
-    /* Hide Streamlit chrome */
-    header[data-testid="stHeader"]          { background: transparent !important; }
-    [data-testid="stDecoration"]            { display: none !important; }
-    [data-testid="stToolbar"]               { display: none !important; }
-    #MainMenu                               { display: none !important; }
-    footer                                  { display: none !important; }
-    /* Lock sidebar open */
-    [data-testid="stSidebarCollapseButton"] { display: none !important; }
-    [data-testid="collapsedControl"]        { display: none !important; }
-    /* Active page indicator — left border + accent colour */
-    [data-testid="stSidebar"] a[aria-current="page"] {
-        border-left: 3px solid #e0a3a3 !important;
-        padding-left: 0.4rem !important;
-        color: #e0a3a3 !important;
-        font-weight: 600 !important;
-    }
-    /* Custom scrollbar */
-    ::-webkit-scrollbar              { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track        { background: #1b1b1b; }
-    ::-webkit-scrollbar-thumb        { background: #5a0010; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover  { background: #e0a3a3; }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# ── App-wide styling, derived from the active theme ───────────────────────────
+# Colours come from plottle.utils.theming.app_css() rather than being hardcoded, so
+# the stylesheet follows whatever the user selects in Settings. Previously the NCCU
+# dark palette was baked in as literals, which left the hero subtitle
+# white-on-white on a light theme (A-17).
+st.markdown(app_css(), unsafe_allow_html=True)
 
 initialize_session_state()
 
@@ -128,7 +98,7 @@ def _home_page() -> None:
             if _LOGO_PNG.exists():
                 _b64 = base64.b64encode(_LOGO_PNG.read_bytes()).decode()
                 st.markdown(
-                    f'<img src="data:image/png;base64,{_b64}"'
+                    f'<img src="data:image/png;base64,{_b64}" alt="Plottle logo"'
                     ' style="width:110px;height:auto;display:block;">',
                     unsafe_allow_html=True,
                 )
@@ -138,7 +108,7 @@ def _home_page() -> None:
                 unsafe_allow_html=True,
             )
             st.markdown(
-                "<p style='color: rgba(255,255,255,0.55); margin-top: 0;'>"
+                "<p class='plottle-muted'>"
                 "Scientific data visualization and analysis "
                 f"&nbsp;&middot;&nbsp; v{__version__}"
                 "</p>",
@@ -166,7 +136,7 @@ def _home_page() -> None:
         st.markdown("""
         1. **Upload Data** — Go to *Data Upload* to load a CSV, Excel, NumPy, or other file.
            Or load a built-in example dataset.
-        2. **Plot** — *Plot → Basic* lets you choose from 26 plot types and configure them
+        2. **Plot** — *Plot → Basic* lets you choose from 27 plot types and configure them
            interactively.
         3. **Analyse** — *Analyze → Single* has curve fitting, statistics, signal processing,
            peak analysis, and more.
@@ -295,7 +265,6 @@ settings_pg = st.Page(
     url_path="settings",
 )
 
-# Data Tools — included in routing for direct URL access; not shown in main nav
 datatools_pg = st.Page(
     str(_PAGES_DIR / "9_Data_Tools.py"),
     title="Data Tools",
@@ -330,22 +299,13 @@ pg = st.navigation(
 
 # ── Custom sidebar navigation ─────────────────────────────────────────────────
 
-_ADV_HEADER = (
-    "<p style='"
-    "margin: 0.6rem 0 0.15rem 0;"
-    "font-size: 0.68rem;"
-    "color: rgba(49,51,63,0.45);"
-    "text-transform: uppercase;"
-    "letter-spacing: 0.07em;"
-    "font-weight: 700;"
-    "'>Advanced</p>"
-)
+_ADV_HEADER = "<p class='plottle-section-label'>Advanced</p>"
 
 with st.sidebar:
     if _LOGO_PNG.exists():
         _sb_logo_b64 = base64.b64encode(_LOGO_PNG.read_bytes()).decode()
         st.markdown(
-            f'<img src="data:image/png;base64,{_sb_logo_b64}"'
+            f'<img src="data:image/png;base64,{_sb_logo_b64}" alt="Plottle logo"'
             ' style="width:72px;height:auto;display:block;margin:0.5rem auto 1rem;">',
             unsafe_allow_html=True,
         )
@@ -363,6 +323,7 @@ with st.sidebar:
     with st.expander("**Analyze**", expanded=pg in _ANALYZE_PAGES):
         st.page_link(single_pg, label="Single")
         st.page_link(batch_pg, label="Batch")
+        st.page_link(datatools_pg, label="Data Tools")
 
     st.divider()
     st.page_link(export_pg, label="Export")
@@ -376,6 +337,7 @@ with st.sidebar:
             _horiz_b64 = base64.b64encode(_NCCU_HORIZ.read_bytes()).decode()
             st.markdown(
                 f'<img src="data:image/png;base64,{_horiz_b64}"'
+                ' alt="North Carolina Central University"'
                 ' style="width:100%;height:auto;margin-bottom:0.4rem;">',
                 unsafe_allow_html=True,
             )
@@ -383,6 +345,7 @@ with st.sidebar:
             _wings_b64 = base64.b64encode(_NCCU_WINGS.read_bytes()).decode()
             st.markdown(
                 f'<img src="data:image/png;base64,{_wings_b64}"'
+                ' alt="NCCU Eagle Wings emblem"'
                 ' style="width:60%;height:auto;display:block;margin:0 auto 0.4rem;">',
                 unsafe_allow_html=True,
             )

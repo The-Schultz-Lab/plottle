@@ -7,7 +7,6 @@ and batch_peak_analysis.  No mocking — all tests operate on real data
 
 from __future__ import annotations
 
-import math
 from pathlib import Path
 
 import numpy as np

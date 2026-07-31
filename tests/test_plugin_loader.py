@@ -4,7 +4,6 @@ import sys
 import types
 from pathlib import Path
 
-import pytest
 
 # Ensure the project root is on the path
 sys.path.insert(0, str(Path(__file__).parent.parent))

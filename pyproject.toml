@@ -53,9 +53,10 @@ formats = [
 nist = [
     "requests>=2.28.0",
 ]
+# Documentation site build (build_docs.py). Sphinx and furo were removed with the
+# unbuilt Sphinx setup they served -- see audit A-13.
 docs = [
-    "sphinx>=7.0.0",
-    "furo>=2024.1.29",
+    "markdown>=3.5",
 ]
 # Only what running the test suite needs. Deliberately separate from `dev`: the test
 # matrix spans Python 3.9-3.12, and the lint tools pinned in `dev` have their own,
@@ -142,12 +143,4 @@ explicit_package_bases = true
 omit = [
     "plottle/Home.py",
     "plottle/pages/*",
-]
-
-[tool.pytest.ini_options]
-markers = [
-    "unit: fast unit tests",
-    "integration: integration tests",
-    "slow: slow tests",
-    "visualization: visualization tests",
 ]

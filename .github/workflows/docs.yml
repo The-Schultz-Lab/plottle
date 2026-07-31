@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "docs/**"
+      - "build_docs.py"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
 
@@ -25,13 +26,30 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install docs build dependencies
+        run: pip install markdown
+
+      # Previously this workflow uploaded ./docs/ raw, which published the markdown
+      # sources as downloads and the Sphinx sources as dead files, while the API
+      # reference was never built at all. build_docs.py renders each guide into a
+      # styled page and wires them together. See audit A-13.
+      - name: Build documentation site
+        run: python build_docs.py
+
       - name: Configure Pages
         uses: actions/configure-pages@v6
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: ./docs/
+          path: ./docs/_site/
 
   deploy:
     name: Deploy to GitHub Pages

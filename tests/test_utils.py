@@ -8,8 +8,6 @@ Covers:
 """
 
 import json
-import tempfile
-import shutil
 import types as _types
 from pathlib import Path
 
@@ -747,7 +745,6 @@ class TestSessionDeserializationIsSafe:
         self, mock_session_state, tmp_path
     ):
         import base64
-        import json
         import pickle
 
         blob = base64.b64encode(pickle.dumps(np.zeros(3))).decode()

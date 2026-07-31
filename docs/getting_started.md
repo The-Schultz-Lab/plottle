@@ -46,11 +46,14 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-### Step 4 — Install dependencies
+### Step 4 — Install Plottle
 
 ```bash
-pip install -r requirements.txt
+pip install -e ".[formats,nist]"
 ```
+
+The `formats` extra adds HDF5 and NetCDF support; `nist` adds the NIST WebBook
+lookup. The editable install is also what puts the `plottle` command on your PATH.
 
 ### Step 5 — Verify
 
@@ -71,7 +74,7 @@ launch.bat
 ### Any platform
 
 ```bash
-streamlit run modules/Home.py
+streamlit run plottle/Home.py
 ```
 
 Open `http://localhost:8501` in your browser. Use the sidebar to navigate between pages.
@@ -94,7 +97,7 @@ import numpy as np
 import sys
 sys.path.insert(0, 'path/to/plottle')
 
-from modules.plotting import line_plot, save_figure
+from plottle.plotting import line_plot, save_figure
 
 # Simulate absorbance vs. wavelength
 wavelength = np.linspace(400, 800, 200)
@@ -116,10 +119,10 @@ save_figure(fig, 'spectrum.png', dpi=300)
 
 ## Loading Data
 
-The `modules.io` module supports eight common formats.
+The `plottle.io` module supports eight common formats.
 
 ```python
-from modules.io import load_data, save_data
+from plottle.io import load_data, save_data
 
 # Auto-detect format from extension
 df   = load_data('experiment.csv')     # → pandas DataFrame
@@ -145,7 +148,7 @@ Supported extensions:
 ## Computing Statistics
 
 ```python
-from modules.math import calculate_statistics
+from plottle.math import calculate_statistics
 
 stats = calculate_statistics(arr)
 print(f"Mean: {stats['mean']:.4f}")
@@ -160,7 +163,7 @@ Returns: `mean`, `median`, `std`, `var`, `min`, `max`, `q1`, `q3`, `iqr`, `range
 ## Curve Fitting
 
 ```python
-from modules.math import fit_linear, fit_polynomial
+from plottle.math import fit_linear, fit_polynomial
 
 # Beer-Lambert: A = ε·c·l  →  linear fit
 result = fit_linear(concentration, absorbance)
@@ -197,7 +200,7 @@ y_fit = poly['predict'](x)          # call the returned predict function
 ## Saving Figures
 
 ```python
-from modules.plotting import save_figure
+from plottle.plotting import save_figure
 
 save_figure(fig, 'plot.png', dpi=300)     # high-res raster
 save_figure(fig, 'plot.svg')              # vector (no dpi needed)
@@ -210,12 +213,20 @@ save_figure(fig, 'plot.pdf')              # vector, publication-ready
 
 | Page | Purpose |
 | --- | --- |
-| **1 — Data Upload** | Load files; preview shape, types, and statistics |
-| **2 — Quick Plot** | Generate any plot type with live configuration controls |
-| **3 — Analysis Tools** | Statistics, curve fitting, smoothing, peak fitting |
-| **4 — Multi-Plot Dashboard** | Side-by-side grid of up to 6 independent plots |
-| **5 — Advanced Plotting** | Correlation heatmaps, overlaid distributions, 3D scatter |
-| **6 — Settings** | Persistent defaults and named style presets |
+| **Home** | Dashboard overview and help tabs |
+| **Data Upload** | Load files in 18 formats; preview shape, types, and statistics; batch folder import |
+| **Plot → Basic** | 27 plot types with live style controls and an annotation panel |
+| **Plot → Multiplot** | Up to 4×4 grid layouts with axis sharing and combined export |
+| **Plot → Advanced Plotting** | Seaborn statistical plots and Plotly interactive charts |
+| **Plot → Spectroscopy** | IR/Raman, NMR, UV-Vis, Mass Spec; NIST WebBook lookup by CAS |
+| **Plot → Molecular Viz** | Gaussian/ORCA/Molden output; 3D structure and vibrational modes |
+| **Analyze → Single** | Statistics, distributions, curve fitting, signal processing, peaks |
+| **Analyze → Batch** | Batch statistics, curve fitting, and peak analysis with presets |
+| **Analyze → Data Tools** | 12 non-destructive DataFrame operations |
+| **Export** | Export plots, data, and analyses; save/load sessions; PDF reports |
+| **Gallery** | Pre-rendered examples with "Use this config" buttons |
+| **Help** | Getting started, plot types, analysis tools, formats, tips |
+| **Settings** | Theme, plot defaults, and named preset management |
 
 ---
 
@@ -224,9 +235,9 @@ save_figure(fig, 'plot.pdf')              # vector, publication-ready
 ### Beer-Lambert calibration curve
 
 ```python
-from modules.io import load_dataframe
-from modules.math import fit_linear
-from modules.plotting import scatter_plot, save_figure
+from plottle.io import load_dataframe
+from plottle.math import fit_linear
+from plottle.plotting import scatter_plot, save_figure
 import numpy as np
 
 df = load_dataframe('calibration.csv')   # columns: concentration, absorbance
@@ -250,7 +261,7 @@ save_figure(fig, 'calibration.png', dpi=300)
 ### Comparing multiple spectra
 
 ```python
-from modules.plotting import line_plot
+from plottle.plotting import line_plot
 
 fig, ax = line_plot(
     wavelength,
@@ -266,7 +277,8 @@ fig, ax = line_plot(
 
 ## Next Steps
 
-- Work through the **Jupyter notebooks** in `notebooks/` for guided tutorials.
-- See `docs/cheatsheet.md` for a quick-reference card of all functions.
-- See `DEPLOYMENT.md` for how to run the GUI locally or on Streamlit Cloud.
-- Report issues or suggestions via the course discussion board.
+- Read the [GUI Guide](tutorials/gui_guide.md) for a tour of every page.
+- Read the [CLI Guide](tutorials/cli_guide.md) for scripted and batch workflows.
+- Keep the [Cheatsheet](cheatsheet.md) handy as a quick reference to the Python API.
+- Found a problem? See [Reporting Bugs](bug-reports.md).
+- Want something added? See [Feature Requests](feature_requests.md).
