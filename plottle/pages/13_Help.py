@@ -41,7 +41,7 @@ with tab_start:
     """)
 
 with tab_plots:
-    st.markdown("## 26 Plot Types")
+    st.markdown("## 27 Plot Types")
 
     col1, col2, col3 = st.columns(3)
     with col1:

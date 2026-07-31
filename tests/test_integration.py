@@ -11,8 +11,6 @@ backend so they run headlessly without a display.
 """
 
 import sys
-import shutil
-import tempfile
 from pathlib import Path
 
 import pytest

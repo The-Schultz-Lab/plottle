@@ -190,3 +190,6 @@ CLAUDE.md
 # Plottle — generated test artifacts (should never be committed)
 tests/*.png
 tests/*.json
+
+# Generated documentation site (build_docs.py)
+docs/_site/

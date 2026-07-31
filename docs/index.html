@@ -222,6 +222,8 @@
       background: linear-gradient(135deg, rgba(139,26,43,0.10), rgba(197,160,40,0.08));
       border: 1px solid rgba(139,26,43,0.12);
     }
+    .feature-card__title a { color: inherit; text-decoration: none; }
+    .feature-card__title a:hover { text-decoration: underline; }
     .feature-card__title {
       font-size: 1.0625rem; font-weight: 700;
       color: #0f172a; margin-bottom: 0.5rem;
@@ -390,6 +392,7 @@
     <a class="nav__link" href="#install">Install</a>
     <a class="nav__link" href="#api">API</a>
     <a class="nav__link" href="#gui">GUI</a>
+    <a class="nav__link" href="#docs">Docs</a>
     <a class="btn btn--ghost" href="https://github.com/The-Schultz-Lab/plottle">GitHub &rarr;</a>
   </div>
 </nav>
@@ -543,7 +546,7 @@
 
       <div class="card">
         <div class="feature-card__icon">📊</div>
-        <div class="feature-card__title">26 Plot Types</div>
+        <div class="feature-card__title">27 Plot Types</div>
         <p class="feature-card__body">
           Scatter, line, bar, histogram, box, violin, heatmap, contour, 3D surface,
           regression, and more &mdash; in Matplotlib, Seaborn, or interactive Plotly.
@@ -953,6 +956,79 @@ plottle compare before.csv after.csv --plot line --output comparison.png
 
 <span class="c"># Convert between supported formats</span>
 plottle convert spectrum.jdx spectrum.csv</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ── Documentation ─────────────────────────────────────────────────────── -->
+<section class="section" id="docs">
+  <div class="container">
+    <h2 class="section__title">Documentation</h2>
+    <p class="section__subtitle">
+      Guides for the GUI, the CLI, and the Python API.
+    </p>
+    <div class="features-grid">
+
+      <div class="card">
+        <div class="feature-card__icon">🚀</div>
+        <div class="feature-card__title">
+          <a href="getting-started.html">Getting Started</a>
+        </div>
+        <p class="feature-card__body">
+          Install Plottle, load your first dataset, and make your first plot.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="feature-card__icon">🖱️</div>
+        <div class="feature-card__title">
+          <a href="gui-guide.html">GUI Guide</a>
+        </div>
+        <p class="feature-card__body">
+          A tour of all 14 pages of the Streamlit interface.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="feature-card__icon">⌨️</div>
+        <div class="feature-card__title">
+          <a href="cli-guide.html">CLI Guide</a>
+        </div>
+        <p class="feature-card__body">
+          The five <code>plottle</code> subcommands, with worked examples.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="feature-card__icon">📖</div>
+        <div class="feature-card__title">
+          <a href="cheatsheet.html">Cheatsheet</a>
+        </div>
+        <p class="feature-card__body">
+          Quick reference for the Python API &mdash; every module, at a glance.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="feature-card__icon">🐛</div>
+        <div class="feature-card__title">
+          <a href="bug-reports.html">Reporting Bugs</a>
+        </div>
+        <p class="feature-card__body">
+          What to include so a problem can be reproduced and fixed.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="feature-card__icon">💡</div>
+        <div class="feature-card__title">
+          <a href="feature-requests.html">Feature Requests</a>
+        </div>
+        <p class="feature-card__body">
+          How to propose new functionality.
+        </p>
+      </div>
+
     </div>
   </div>
 </section>

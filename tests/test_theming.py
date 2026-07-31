@@ -267,9 +267,7 @@ class TestHomePageUsesThemedCss:
         img_count = home_source.count("<img src=")
         alt_count = home_source.count("alt=")
         assert img_count > 0
-        assert alt_count >= img_count, (
-            f"{img_count} <img> tags but only {alt_count} alt attributes"
-        )
+        assert alt_count >= img_count, f"{img_count} <img> tags but only {alt_count} alt attributes"
 
     def test_data_tools_is_reachable_from_the_nav(self, home_source: str):
         """A-30: the page was routable by URL but had no sidebar link, and

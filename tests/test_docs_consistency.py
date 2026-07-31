@@ -75,7 +75,7 @@ class TestDocumentedPlotCountMatchesCode:
 
         # Any "<n> plot types" / "<n> plot functions" claim must use the real number.
         stated = {
-            int(n) for n in re.findall(r"(\d+)\s+plot\s+(?:types|functions)\b", text)
+            int(n) for n in re.findall(r"(\d+)\s+plot\s+(?:types|functions)\b", text, re.IGNORECASE)
         }
         wrong = sorted(n for n in stated if n != expected)
         assert not wrong, (
@@ -93,7 +93,11 @@ class TestDocumentedPlotCountMatchesCode:
         found = [
             path.relative_to(_REPO_ROOT)
             for path in _FILES_STATING_THE_COUNT
-            if re.search(rf"{expected}\s+plot\s+(?:types|functions)\b", path.read_text("utf-8"))
+            if re.search(
+                rf"{expected}\s+plot\s+(?:types|functions)\b",
+                path.read_text("utf-8"),
+                re.IGNORECASE,
+            )
         ]
         assert found, (
             f"no documentation file states '{expected} plot types' -- either the "

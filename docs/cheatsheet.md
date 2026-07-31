@@ -10,9 +10,9 @@ NCCU Department of Chemistry and Biochemistry
 import sys
 sys.path.insert(0, 'path/to/plottle')
 
-from modules.io import load_data, save_data
-from modules.math import calculate_statistics, fit_linear, fit_polynomial
-from modules.plotting import line_plot, scatter_plot, histogram, save_figure
+from plottle.io import load_data, save_data
+from plottle.math import calculate_statistics, fit_linear, fit_polynomial
+from plottle.plotting import line_plot, scatter_plot, histogram, save_figure
 ```
 
 ---
@@ -20,7 +20,7 @@ from modules.plotting import line_plot, scatter_plot, histogram, save_figure
 ## I/O — Loading Data
 
 ```python
-from modules.io import load_data, load_dataframe, load_numpy, load_pickle
+from plottle.io import load_data, load_dataframe, load_numpy, load_pickle
 
 df  = load_data('data.csv')       # auto-detect by extension
 df  = load_dataframe('data.csv')  # → DataFrame  (.csv .xlsx .tsv .json .parquet)
@@ -31,7 +31,7 @@ obj = load_pickle('data.pkl')     # → any object (.pkl)
 ## I/O — Saving Data
 
 ```python
-from modules.io import save_data, save_dataframe, save_numpy, save_pickle
+from plottle.io import save_data, save_dataframe, save_numpy, save_pickle
 
 save_data(df, 'output.csv')
 save_dataframe(df, 'output.xlsx')
@@ -44,7 +44,7 @@ save_pickle(obj, 'session.pkl')
 ## Statistics
 
 ```python
-from modules.math import (
+from plottle.math import (
     calculate_mean, calculate_median, calculate_std, calculate_statistics,
     check_normality,
 )
@@ -65,7 +65,7 @@ norm = check_normality(arr)
 ## Curve Fitting
 
 ```python
-from modules.math import fit_linear, fit_polynomial, fit_exponential, fit_custom
+from plottle.math import fit_linear, fit_polynomial, fit_exponential, fit_custom
 
 # Linear  y = m·x + b
 r = fit_linear(x, y)
@@ -92,7 +92,7 @@ r = fit_custom(x, y, func=my_func, p0=[1.0, 0.1, 0.0])
 ## Matplotlib Plots
 
 ```python
-from modules.plotting import histogram, line_plot, scatter_plot, heatmap, contour_plot
+from plottle.plotting import histogram, line_plot, scatter_plot, heatmap, contour_plot
 
 # Histogram
 fig, ax, info = histogram(data, bins=20, xlabel='Value', ylabel='Count', title='Distribution')
@@ -116,7 +116,7 @@ fig, ax = contour_plot(X, Y, Z, title='Potential Energy Surface')
 ## Seaborn Plots
 
 ```python
-from modules.plotting import distribution_plot, box_plot, regression_plot
+from plottle.plotting import distribution_plot, box_plot, regression_plot
 
 fig, ax = distribution_plot(data, kind='kde')   # kind: hist | kde | ecdf
 fig, ax = box_plot(df)                           # or box_plot(df, kind='violin')
@@ -126,7 +126,7 @@ fig, ax = regression_plot(x, y)                  # scatter + regression line + C
 ## Interactive (Plotly) Plots
 
 ```python
-from modules.plotting import (
+from plottle.plotting import (
     interactive_histogram, interactive_scatter, interactive_line,
     interactive_heatmap, interactive_3d_surface,
 )
@@ -146,7 +146,7 @@ fig.write_html('plot.html') # save as self-contained HTML
 ## Saving Figures
 
 ```python
-from modules.plotting import save_figure
+from plottle.plotting import save_figure
 
 save_figure(fig, 'plot.png', dpi=150)   # screen quality
 save_figure(fig, 'plot.png', dpi=300)   # print / publication quality
@@ -249,7 +249,7 @@ fig, ax = heatmap(corr, title='Correlation Matrix')
 
 ```python
 # Available in the GUI Settings page and plot_config module
-from modules.utils.plot_config import COLOR_PALETTES
+from plottle.utils.plot_config import COLOR_PALETTES
 
 palettes = list(COLOR_PALETTES.keys())
 # 'Default', 'Color-Blind Safe (Wong)', 'Color-Blind Safe (Okabe-Ito)',
