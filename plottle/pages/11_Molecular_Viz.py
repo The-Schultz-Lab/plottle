@@ -15,8 +15,8 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from modules.utils.session_state import initialize_session_state
-from modules.molecular import (
+from plottle.utils.session_state import initialize_session_state
+from plottle.molecular import (
     VibrationalData,
     build_molecule_figure,
     parse_vibrations,
@@ -210,7 +210,7 @@ with col2:
 # Atom coordinates table
 # ─────────────────────────────────────────────────────────────────────────────
 with st.expander("Atomic Coordinates", expanded=False):
-    from modules.molecular.atom_data import get_atom_symbol
+    from plottle.molecular.atom_data import get_atom_symbol
 
     coord_df = pd.DataFrame(
         {

@@ -25,7 +25,7 @@ Settings
 
 Usage
 -----
-    streamlit run modules/Home.py
+    streamlit run plottle/Home.py
 """
 
 import base64
@@ -42,8 +42,8 @@ _ASSETS_DIR = _REPO_ROOT / "assets"
 _NCCU_HORIZ = _ASSETS_DIR / "nccu-horiz-logo.png"
 _NCCU_WINGS = _ASSETS_DIR / "nccu-wings.png"
 
-from modules import __version__  # noqa: E402
-from modules.utils import initialize_session_state, get_session_summary  # noqa: E402
+from plottle import __version__  # noqa: E402
+from plottle.utils import initialize_session_state, get_session_summary  # noqa: E402
 
 try:
     from PIL import Image as _PILImage

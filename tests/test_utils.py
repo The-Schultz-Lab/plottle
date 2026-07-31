@@ -1,10 +1,10 @@
 """Unit tests for the utils modules.
 
 Covers:
-- modules.utils.user_settings  — config.json CRUD operations
-- modules.utils.plot_config    — get_plot_kwargs, COLOR_PALETTES, PLOT_TYPES
-- modules.utils.session_state  — dataset management, serialization, save/load
-- modules.utils.data_preview   — pure info helpers and Streamlit display helpers
+- plottle.utils.user_settings  — config.json CRUD operations
+- plottle.utils.plot_config    — get_plot_kwargs, COLOR_PALETTES, PLOT_TYPES
+- plottle.utils.session_state  — dataset management, serialization, save/load
+- plottle.utils.data_preview   — pure info helpers and Streamlit display helpers
 """
 
 import json
@@ -20,23 +20,23 @@ import pytest
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import modules.utils.user_settings as us
-import modules.utils.session_state as _ss
-import modules.utils.data_preview as _dp
-from modules.utils.plot_config import (
+import plottle.utils.user_settings as us
+import plottle.utils.session_state as _ss
+import plottle.utils.data_preview as _dp
+from plottle.utils.plot_config import (
     COLOR_PALETTES,
     COLOR_PALETTE_NAMES,
     PLOT_TYPES,
     get_plot_kwargs,
 )
-from modules.utils.session_state import (
+from plottle.utils.session_state import (
     _serialize_data, _deserialize_data,
     initialize_session_state, add_dataset, get_current_dataset, get_dataset,
     delete_dataset, add_plot_to_history, clear_plot_history,
     add_analysis_result, save_session_to_file, load_session_from_file,
     clear_session, get_session_summary,
 )
-from modules.utils.data_preview import (
+from plottle.utils.data_preview import (
     preview_dataframe, get_dataframe_info, get_array_info,
     format_data_size, get_column_suggestions, get_plottable_arrays,
     display_dataset_card, display_data_preview,
@@ -691,7 +691,7 @@ class TestSessionDeserializationIsSafe:
     """
 
     def test_session_state_module_does_not_import_pickle(self):
-        import modules.utils.session_state as ss
+        import plottle.utils.session_state as ss
 
         assert not hasattr(ss, 'pickle'), (
             'session_state must not import pickle — it is reachable from an upload'

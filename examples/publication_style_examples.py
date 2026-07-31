@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.plotting import (
+from plottle.plotting import (
     line_plot,
     scatter_plot,
     apply_publication_style,
@@ -27,7 +27,7 @@ from modules.plotting import (
     configure_axes,
     save_figure,
 )
-from modules.utils.plot_config import COLOR_PALETTE_NAMES
+from plottle.utils.plot_config import COLOR_PALETTE_NAMES
 
 OUTPUT_DIR = Path(__file__).parent / "plots"
 OUTPUT_DIR.mkdir(exist_ok=True)

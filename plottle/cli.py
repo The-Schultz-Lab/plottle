@@ -44,10 +44,10 @@ import numpy as np
 import pandas as pd
 
 # Import module functions
-from modules import __version__
-from modules.io import load_data, save_data
-from modules.math import calculate_statistics, check_normality
-from modules.plotting import (
+from plottle import __version__
+from plottle.io import load_data, save_data
+from plottle.math import calculate_statistics, check_normality
+from plottle.plotting import (
     histogram,
     line_plot,
     scatter_plot,
@@ -58,7 +58,7 @@ from modules.plotting import (
 
 # Optional imports for advanced plotting
 try:
-    from modules.plotting import (
+    from plottle.plotting import (
         distribution_plot,
         box_plot,
         regression_plot,

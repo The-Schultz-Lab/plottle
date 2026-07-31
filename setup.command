@@ -38,7 +38,7 @@ echo "Installing dependencies (this may take a few minutes on first run)..."
 echo
 
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -e ".[formats,nist]"
 
 if [ $? -ne 0 ]; then
     echo

@@ -48,22 +48,27 @@ python -m venv .venv
 
 # Windows
 .venv\Scripts\activate
-pip install -r requirements.txt
 
 # macOS / Linux
 source .venv/bin/activate
-pip install -r requirements.txt
 
-streamlit run modules/Home.py
+# Install Plottle and its dependencies. The editable install is what puts the
+# `plottle` command on your PATH.
+pip install -e ".[formats,nist]"
+
+streamlit run plottle/Home.py
 ```
 
 #### 3 — Or use the CLI
 
 ```bash
-python cli.py --help
-python cli.py plot data.csv --plot scatter --x-column x --y-column y
-python cli.py stats data.csv
+plottle --help
+plottle plot data.csv --plot scatter --x-column x --y-column y
+plottle stats data.csv
 ```
+
+The `plottle` command comes from the `pip install` above. From a source checkout
+without installing, use `python -m plottle.cli` instead.
 
 ## GUI Pages
 
@@ -97,11 +102,11 @@ python cli.py stats data.csv
 Plottle includes a command-line interface with 5 subcommands:
 
 ```bash
-python cli.py plot    <file> --plot <type> --x-column X --y-column Y [--output out.png]
-python cli.py stats  <file>
-python cli.py batch  <config.json> [--verbose]
-python cli.py compare <file1> <file2> --plot line [--output comparison.png]
-python cli.py convert <input> <output>
+plottle plot    <file> --plot <type> --x-column X --y-column Y [--output out.png]
+plottle stats  <file>
+plottle batch  <config.json> [--verbose]
+plottle compare <file1> <file2> --plot line [--output comparison.png]
+plottle convert <input> <output>
 ```
 
 See the [CLI Tutorial](docs/tutorials/cli_guide.md) for full usage and examples.
@@ -198,7 +203,7 @@ plottle/
 │   ├── molecular/                  ← CPK atom data + vibrational parsers
 │   ├── pages/                      ← 13 Streamlit pages (1_*.py – 14_*.py)
 │   └── utils/                      ← session state, plot config, user settings
-├── cli.py                          ← CLI entry point (5 subcommands)
+├── plottle/cli.py                          ← CLI entry point (5 subcommands)
 ├── tests/                          ← 17 test files, 900+ tests
 ├── plugins/                        ← plugin_example.py starter template
 ├── examples/                       ← 15+ standalone scripts + batch_config.json

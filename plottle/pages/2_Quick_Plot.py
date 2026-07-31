@@ -2,7 +2,7 @@
 
 Select a loaded dataset, choose a plot type, configure parameters,
 and generate a publication-ready or interactive visualization.
-All 13 plot types from modules.plotting are accessible here.
+All 13 plot types from plottle.plotting are accessible here.
 """
 
 import traceback
@@ -15,7 +15,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from modules.plotting import (
+from plottle.plotting import (
     histogram,
     line_plot,
     scatter_plot,
@@ -44,7 +44,7 @@ from modules.plotting import (
     interactive_ternary,
     inset_plot,
 )
-from modules.utils import (
+from plottle.utils import (
     initialize_session_state,
     get_dataset,
     add_plot_to_history,
@@ -57,7 +57,7 @@ from modules.utils import (
 )
 import matplotlib as mpl
 
-from modules.utils.plot_config import (
+from plottle.utils.plot_config import (
     PLOT_TYPES,
     COLOR_PALETTES,
     get_plot_config_widgets,
@@ -956,7 +956,7 @@ def _regen_with_overlays() -> None:
             _apply_mpl_style(fig, cfg)
             overlays = st.session_state.get("qp_ann_overlays", [])
             if overlays and fig.axes:
-                from modules.annotations import apply_annotations
+                from plottle.annotations import apply_annotations
 
                 apply_annotations(fig.axes[0], overlays)
             st.session_state.qp_mpl_fig = fig
@@ -971,7 +971,7 @@ def _annotation_input_widgets(ann_type: str) -> dict | None:
     All widget keys are prefixed with ``ann_new_`` to avoid collision with other
     widgets on the page.
     """
-    from modules.annotations import ANNOTATION_COLORS, ANNOTATION_LINESTYLES
+    from plottle.annotations import ANNOTATION_COLORS, ANNOTATION_LINESTYLES
 
     color = st.selectbox(
         "Color",
@@ -1106,7 +1106,7 @@ def _annotation_input_widgets(ann_type: str) -> dict | None:
 
 def _render_annotation_panel() -> None:
     """Render the full annotations expander panel for the current matplotlib figure."""
-    from modules.annotations import describe_overlay
+    from plottle.annotations import describe_overlay
 
     overlays: list = st.session_state.qp_ann_overlays
 
@@ -1394,7 +1394,7 @@ else:
                     # Re-apply any existing overlays to the fresh figure
                     _overlays = st.session_state.get("qp_ann_overlays", [])
                     if _overlays and fig.axes:
-                        from modules.annotations import apply_annotations
+                        from plottle.annotations import apply_annotations
 
                         apply_annotations(fig.axes[0], _overlays)
                     st.session_state.qp_fig_dict = None

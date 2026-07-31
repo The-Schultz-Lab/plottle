@@ -1,4 +1,4 @@
-"""Tests for modules/report.py — PDF report generator."""
+"""Tests for plottle/report.py — PDF report generator."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import pandas as pd
 import pytest
 from pathlib import Path
 
-from modules.report import (
+from plottle.report import (
     _analysis_result_to_figure,
     _dataframe_to_figure,
     _make_title_page,

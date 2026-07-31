@@ -1,4 +1,4 @@
-"""Tests for modules/batch.py.
+"""Tests for plottle/batch.py.
 
 Covers scan_directory, batch_load_files, batch_statistics, batch_curve_fit,
 and batch_peak_analysis.  No mocking — all tests operate on real data
@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from modules.batch import (
+from plottle.batch import (
     scan_directory,
     batch_load_files,
     batch_statistics,

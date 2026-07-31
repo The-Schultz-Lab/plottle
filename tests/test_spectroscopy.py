@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from modules.spectroscopy import (
+from plottle.spectroscopy import (
     FUNCTIONAL_GROUPS,
     absorbance_to_transmittance,
     apply_line_broadening,

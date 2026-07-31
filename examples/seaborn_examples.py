@@ -17,7 +17,7 @@ matplotlib.use("Agg")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.plotting import (
+from plottle.plotting import (
     distribution_plot,
     box_plot,
     regression_plot,

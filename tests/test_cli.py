@@ -53,7 +53,7 @@ def run_cli(*args):
     # have the project's dependencies installed, and every one of these tests
     # fails with ModuleNotFoundError. See G-016 / audit A-11a.
     repo_root = Path(__file__).resolve().parent.parent
-    cmd = [sys.executable, str(repo_root / 'cli.py')] + list(args)
+    cmd = [sys.executable, '-m', 'plottle.cli'] + list(args)
     result = subprocess.run(
         cmd,
         cwd=repo_root,
@@ -81,11 +81,11 @@ class TestBasicCLI:
     def test_version(self):
         """Test that --version reports the packaged version.
 
-        Asserts against ``modules.__version__`` rather than a hardcoded string:
+        Asserts against ``plottle.__version__`` rather than a hardcoded string:
         this test previously asserted '1.0.0' and went stale unnoticed because
         CI never ran tests/test_cli.py. See audit A-11 / A-26.
         """
-        from modules import __version__
+        from plottle import __version__
 
         result = run_cli('--version')
         assert result.returncode == 0

@@ -36,7 +36,7 @@ echo Installing dependencies (this may take a few minutes on first run)...
 echo.
 
 call .venv\Scripts\activate.bat
-pip install -r requirements.txt
+pip install -e ".[formats,nist]"
 
 if errorlevel 1 (
     echo.

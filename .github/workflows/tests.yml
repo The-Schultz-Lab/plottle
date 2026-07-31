@@ -22,27 +22,27 @@ jobs:
         run: pip install ruff mypy types-PyYAML types-requests
 
       - name: ruff check
-        run: ruff check modules/ cli.py __init__.py
+        run: ruff check plottle/
 
       - name: ruff format check
-        run: ruff format --check modules/ cli.py __init__.py
+        run: ruff format --check plottle/
 
       - name: mypy check
         run: |
           mypy \
-            modules/io.py \
-            modules/math.py \
-            modules/plotting.py \
-            modules/signal.py \
-            modules/peaks.py \
-            modules/data_tools.py \
-            modules/annotations.py \
-            modules/batch.py \
-            modules/report.py \
-            modules/plugin_loader.py \
-            modules/spectroscopy.py \
-            modules/nist.py \
-            cli.py \
+            plottle/io.py \
+            plottle/math.py \
+            plottle/plotting.py \
+            plottle/signal.py \
+            plottle/peaks.py \
+            plottle/data_tools.py \
+            plottle/annotations.py \
+            plottle/batch.py \
+            plottle/report.py \
+            plottle/plugin_loader.py \
+            plottle/spectroscopy.py \
+            plottle/nist.py \
+            plottle/cli.py \
             --ignore-missing-imports --no-strict-optional --explicit-package-bases
 
   test:
@@ -79,7 +79,7 @@ jobs:
             tests/test_report.py \
             tests/test_plugin_loader.py \
             tests/test_nist.py \
-            --cov=modules \
+            --cov=plottle \
             --cov-report=xml \
             --cov-report=term-missing \
             -v

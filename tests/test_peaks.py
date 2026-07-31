@@ -1,11 +1,11 @@
-"""Unit tests for modules/peaks.py — Peak Analysis module."""
+"""Unit tests for plottle/peaks.py — Peak Analysis module."""
 
 from __future__ import annotations
 
 import numpy as np
 import pytest
 
-from modules.peaks import (
+from plottle.peaks import (
     compute_fwhm,
     find_peaks,
     fit_multipeak,
