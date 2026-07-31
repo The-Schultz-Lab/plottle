@@ -1,4 +1,4 @@
-"""Tests for modules/plugin_loader.py."""
+"""Tests for plottle/plugin_loader.py."""
 
 import sys
 import types
@@ -9,7 +9,7 @@ import pytest
 # Ensure the project root is on the path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.plugin_loader import (
+from plottle.plugin_loader import (
     discover_plugins,
     get_plugin_analysis_tools,
     get_plugin_plot_types,

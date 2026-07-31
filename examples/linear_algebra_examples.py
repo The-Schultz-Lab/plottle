@@ -16,8 +16,8 @@ matplotlib.use("Agg")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.math import compute_eigenvalues, solve_linear_system, matrix_decomposition
-from modules.plotting import heatmap, save_figure
+from plottle.math import compute_eigenvalues, solve_linear_system, matrix_decomposition
+from plottle.plotting import heatmap, save_figure
 
 OUTPUT_DIR = Path(__file__).parent / "plots"
 OUTPUT_DIR.mkdir(exist_ok=True)

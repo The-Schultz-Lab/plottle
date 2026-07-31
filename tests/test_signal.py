@@ -1,11 +1,11 @@
-"""Unit tests for modules/signal.py — Signal Processing module."""
+"""Unit tests for plottle/signal.py — Signal Processing module."""
 
 from __future__ import annotations
 
 import numpy as np
 import pytest
 
-from modules.signal import (
+from plottle.signal import (
     baseline_als,
     baseline_polynomial,
     baseline_rolling_ball,

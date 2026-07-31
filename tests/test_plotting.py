@@ -19,7 +19,7 @@ import shutil
 
 # Import functions to test
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from modules.plotting import (
+from plottle.plotting import (
     # Figure management
     create_figure, configure_axes, save_figure,
     # Core plots

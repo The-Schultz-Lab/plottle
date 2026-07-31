@@ -1,4 +1,4 @@
-"""Tests for modules/molecular/parsers.py and modules/molecular/atom_data.py."""
+"""Tests for plottle/molecular/parsers.py and plottle/molecular/atom_data.py."""
 
 import os
 import sys
@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from modules.molecular.parsers import (
+from plottle.molecular.parsers import (
     VibrationalData,
     VibrationalMode,
     build_molecule_figure,
@@ -19,7 +19,7 @@ from modules.molecular.parsers import (
     parse_orca_vibrations,
     parse_vibrations,
 )
-from modules.molecular.atom_data import (
+from plottle.molecular.atom_data import (
     BOHR_TO_ANGSTROM,
     atom_colors,
     atom_symbols,

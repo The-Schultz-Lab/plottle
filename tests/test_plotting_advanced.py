@@ -19,7 +19,7 @@ matplotlib.use('Agg')
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.plotting import (
+from plottle.plotting import (
     distribution_plot, box_plot, regression_plot,
     interactive_histogram, interactive_scatter, interactive_line,
     interactive_heatmap, interactive_3d_surface,
@@ -519,7 +519,7 @@ class TestPairPlot:
 
     def test_no_seaborn_raises(self):
         """ImportError raised when seaborn unavailable (mock HAS_SEABORN)."""
-        import modules.plotting as mp
+        import plottle.plotting as mp
         orig = mp.HAS_SEABORN
         mp.HAS_SEABORN = False
         try:
@@ -558,7 +558,7 @@ class TestInteractive3DScatter:
 
     def test_no_plotly_raises(self):
         """ImportError raised when plotly unavailable (mock HAS_PLOTLY)."""
-        import modules.plotting as mp
+        import plottle.plotting as mp
         orig = mp.HAS_PLOTLY
         mp.HAS_PLOTLY = False
         try:
@@ -604,7 +604,7 @@ class TestInteractiveTernary:
         assert info["n_points"] == 1
 
     def test_no_plotly_raises(self):
-        import modules.plotting as mp
+        import plottle.plotting as mp
         orig = mp.HAS_PLOTLY
         mp.HAS_PLOTLY = False
         with pytest.raises(ImportError):

@@ -1,7 +1,7 @@
 """Gallery Generator — Plottle.
 
 Run this script once from the repo root to produce pre-rendered PNG thumbnails
-and a ``docs/gallery/manifest.json`` file that the Gallery page reads.
+and a ``plottle/gallery/manifest.json`` file that the Gallery page reads.
 
 Usage
 -----
@@ -9,7 +9,7 @@ Usage
 
 Output
 ------
-docs/gallery/
+plottle/gallery/
     manifest.json           — metadata for all generated figures
     histogram.png
     line_plot.png
@@ -33,13 +33,13 @@ import pandas as pd
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 _ROOT = Path(__file__).parent
-_EXAMPLE_DIR = _ROOT / "example-data" / "Artificial"
-_GALLERY_DIR = _ROOT / "docs" / "gallery"
+_EXAMPLE_DIR = _ROOT / "plottle" / "example-data" / "Artificial"
+_GALLERY_DIR = _ROOT / "plottle" / "gallery"
 _GALLERY_DIR.mkdir(parents=True, exist_ok=True)
 
 sys.path.insert(0, str(_ROOT))
 
-from modules.plotting import (  # noqa: E402
+from plottle.plotting import (  # noqa: E402
     histogram,
     line_plot,
     scatter_plot,

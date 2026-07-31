@@ -11,7 +11,7 @@ The CLI is included in the Plottle package. No additional installation is requir
 ## Basic Usage
 
 ```bash
-python cli.py [OPTIONS] COMMAND [ARGS...]
+plottle [OPTIONS] COMMAND [ARGS...]
 ```
 
 ## Global Options
@@ -30,7 +30,7 @@ Create various types of plots from data files.
 
 **Syntax:**
 ```bash
-python cli.py plot --input FILE --type TYPE [OPTIONS]
+plottle plot --input FILE --type TYPE [OPTIONS]
 ```
 
 **Required Arguments:**
@@ -72,25 +72,25 @@ python cli.py plot --input FILE --type TYPE [OPTIONS]
 
 ```bash
 # Simple histogram
-python cli.py plot --input data.npy --type histogram --output hist.png
+plottle plot --input data.npy --type histogram --output hist.png
 
 # Customized histogram
-python cli.py plot --input data.csv --column Temperature --type histogram \
+plottle plot --input data.csv --column Temperature --type histogram \
     --bins 50 --title "Temperature Distribution" \
     --xlabel "Temperature (K)" --ylabel "Frequency" \
     --output temp_dist.png
 
 # Line plot with styling
-python cli.py plot --input timeseries.csv --type line \
+plottle plot --input timeseries.csv --type line \
     --title "Time Series Data" --color blue --style "--" \
     --marker o --output timeseries.png
 
 # Interactive plot
-python cli.py plot --input data.npy --type interactive_histogram \
+plottle plot --input data.npy --type interactive_histogram \
     --output interactive.html --bins 40
 
 # Scatter plot with limits
-python cli.py plot --input points.csv --type scatter \
+plottle plot --input points.csv --type scatter \
     --xlim "0,10" --ylim "0,100" --output scatter.png
 ```
 
@@ -100,7 +100,7 @@ Calculate and display statistical summary of data.
 
 **Syntax:**
 ```bash
-python cli.py stats --input FILE [OPTIONS]
+plottle stats --input FILE [OPTIONS]
 ```
 
 **Required Arguments:**
@@ -121,16 +121,16 @@ python cli.py stats --input FILE [OPTIONS]
 
 ```bash
 # Basic statistics
-python cli.py stats --input data.npy
+plottle stats --input data.npy
 
 # Statistics for specific column
-python cli.py stats --input data.csv --column Temperature
+plottle stats --input data.csv --column Temperature
 
 # Statistics with normality test
-python cli.py stats --input data.csv --column Values --normality
+plottle stats --input data.csv --column Values --normality
 
 # Save statistics to file
-python cli.py stats --input data.npy --output stats.json --normality
+plottle stats --input data.npy --output stats.json --normality
 ```
 
 ### 3. batch - Batch Processing
@@ -139,7 +139,7 @@ Process multiple files using a configuration file.
 
 **Syntax:**
 ```bash
-python cli.py batch --config FILE
+plottle batch --config FILE
 ```
 
 **Required Arguments:**
@@ -195,10 +195,10 @@ tasks:
 
 ```bash
 # Run batch processing
-python cli.py batch --config batch_config.json
+plottle batch --config batch_config.json
 
 # Run with verbose output
-python cli.py --verbose batch --config analysis_pipeline.yaml
+plottle --verbose batch --config analysis_pipeline.yaml
 ```
 
 ### 4. compare - Compare Datasets
@@ -207,7 +207,7 @@ Compare multiple datasets on the same plot.
 
 **Syntax:**
 ```bash
-python cli.py compare --inputs FILE1 FILE2 [FILE3...] [OPTIONS]
+plottle compare --inputs FILE1 FILE2 [FILE3...] [OPTIONS]
 ```
 
 **Required Arguments:**
@@ -228,16 +228,16 @@ python cli.py compare --inputs FILE1 FILE2 [FILE3...] [OPTIONS]
 
 ```bash
 # Compare with histogram
-python cli.py compare --inputs data1.csv data2.csv data3.csv \
+plottle compare --inputs data1.csv data2.csv data3.csv \
     --type histogram --output comparison.png
 
 # Compare with labels
-python cli.py compare --inputs trial1.npy trial2.npy trial3.npy \
+plottle compare --inputs trial1.npy trial2.npy trial3.npy \
     --type line --labels "Trial 1" "Trial 2" "Trial 3" \
     --title "Trial Comparison" --output trials.png
 
 # Compare specific column
-python cli.py compare --inputs exp1.csv exp2.csv \
+plottle compare --inputs exp1.csv exp2.csv \
     --column Temperature --type histogram --bins 40 \
     --output temp_comparison.png
 ```
@@ -248,7 +248,7 @@ Convert data between different file formats.
 
 **Syntax:**
 ```bash
-python cli.py convert --input FILE --output FILE
+plottle convert --input FILE --output FILE
 ```
 
 **Required Arguments:**
@@ -269,13 +269,13 @@ python cli.py convert --input FILE --output FILE
 
 ```bash
 # Convert pickle to CSV
-python cli.py convert --input data.pkl --output data.csv
+plottle convert --input data.pkl --output data.csv
 
 # Convert NumPy to Excel
-python cli.py convert --input arrays.npy --output data.xlsx
+plottle convert --input arrays.npy --output data.xlsx
 
 # Convert CSV to Parquet
-python cli.py convert --input large_data.csv --output large_data.parquet
+plottle convert --input large_data.csv --output large_data.parquet
 ```
 
 ## Advanced Usage
@@ -285,7 +285,7 @@ python cli.py convert --input large_data.csv --output large_data.parquet
 Use `--verbose` before the command for detailed logging:
 
 ```bash
-python cli.py --verbose plot --input data.npy --type histogram --output plot.png
+plottle --verbose plot --input data.npy --type histogram --output plot.png
 ```
 
 Output:
@@ -300,7 +300,7 @@ Output:
 Use `--quiet` to suppress all non-error messages:
 
 ```bash
-python cli.py --quiet batch --config large_pipeline.json
+plottle --quiet batch --config large_pipeline.json
 ```
 
 ### Chaining with Shell Commands
@@ -310,12 +310,12 @@ Use CLI in shell pipelines:
 ```bash
 # Find all .npy files and create histograms
 for file in examples/data/*.npy; do
-    python cli.py plot --input "$file" --type histogram \
+    plottle plot --input "$file" --type histogram \
         --output "plots/$(basename "$file" .npy)_hist.png"
 done
 
 # Process with logging
-python cli.py --verbose stats --input data.csv 2>&1 | tee analysis.log
+plottle --verbose stats --input data.csv 2>&1 | tee analysis.log
 ```
 
 ### Integration with Scripts
@@ -329,14 +329,14 @@ Use the CLI from shell scripts:
 echo "Running analysis pipeline..."
 
 # Step 1: Generate plots
-python cli.py plot --input raw_data.csv --type line --output plot1.png
-python cli.py plot --input raw_data.csv --type histogram --output plot2.png
+plottle plot --input raw_data.csv --type line --output plot1.png
+plottle plot --input raw_data.csv --type histogram --output plot2.png
 
 # Step 2: Calculate statistics
-python cli.py stats --input raw_data.csv --output stats.json --normality
+plottle stats --input raw_data.csv --output stats.json --normality
 
 # Step 3: Compare with reference
-python cli.py compare --inputs raw_data.csv reference.csv \
+plottle compare --inputs raw_data.csv reference.csv \
     --type line --labels "Current" "Reference" --output comparison.png
 
 echo "Analysis complete!"
@@ -353,12 +353,12 @@ The CLI provides clear error messages:
 
 **Invalid Arguments:**
 ```
-cli.py: error: argument --type: invalid choice: 'invalid_type'
+plottle/cli.py: error: argument --type: invalid choice: 'invalid_type'
 ```
 
 **Missing Required Arguments:**
 ```
-cli.py: error: the following arguments are required: --input
+plottle/cli.py: error: the following arguments are required: --input
 ```
 
 **Data Format Errors:**
@@ -400,17 +400,17 @@ When running interactively:
 
 ```bash
 # General help
-python cli.py --help
+plottle --help
 
 # Command-specific help
-python cli.py plot --help
-python cli.py stats --help
-python cli.py batch --help
-python cli.py compare --help
-python cli.py convert --help
+plottle plot --help
+plottle stats --help
+plottle batch --help
+plottle compare --help
+plottle convert --help
 
 # Show examples
-python cli.py --examples
+plottle --examples
 ```
 
 ## Troubleshooting

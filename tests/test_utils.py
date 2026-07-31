@@ -1,10 +1,10 @@
 """Unit tests for the utils modules.
 
 Covers:
-- modules.utils.user_settings  — config.json CRUD operations
-- modules.utils.plot_config    — get_plot_kwargs, COLOR_PALETTES, PLOT_TYPES
-- modules.utils.session_state  — dataset management, serialization, save/load
-- modules.utils.data_preview   — pure info helpers and Streamlit display helpers
+- plottle.utils.user_settings  — config.json CRUD operations
+- plottle.utils.plot_config    — get_plot_kwargs, COLOR_PALETTES, PLOT_TYPES
+- plottle.utils.session_state  — dataset management, serialization, save/load
+- plottle.utils.data_preview   — pure info helpers and Streamlit display helpers
 """
 
 import json
@@ -20,23 +20,23 @@ import pytest
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import modules.utils.user_settings as us
-import modules.utils.session_state as _ss
-import modules.utils.data_preview as _dp
-from modules.utils.plot_config import (
+import plottle.utils.user_settings as us
+import plottle.utils.session_state as _ss
+import plottle.utils.data_preview as _dp
+from plottle.utils.plot_config import (
     COLOR_PALETTES,
     COLOR_PALETTE_NAMES,
     PLOT_TYPES,
     get_plot_kwargs,
 )
-from modules.utils.session_state import (
+from plottle.utils.session_state import (
     _serialize_data, _deserialize_data,
     initialize_session_state, add_dataset, get_current_dataset, get_dataset,
     delete_dataset, add_plot_to_history, clear_plot_history,
     add_analysis_result, save_session_to_file, load_session_from_file,
     clear_session, get_session_summary,
 )
-from modules.utils.data_preview import (
+from plottle.utils.data_preview import (
     preview_dataframe, get_dataframe_info, get_array_info,
     format_data_size, get_column_suggestions, get_plottable_arrays,
     display_dataset_card, display_data_preview,
@@ -618,12 +618,39 @@ class TestSerializeDeserialize:
         restored = _deserialize_data(serialized)
         assert list(restored.columns) == ['x', 'y']
 
-    def test_serialize_unknown_type_pickled_roundtrip(self):
-        # complex is not handled by any explicit branch → falls to pickle fallback
-        val = complex(3, 4)
-        serialized = _serialize_data(val)
-        assert serialized['__type__'] == 'pickled'
-        assert _deserialize_data(serialized) == val
+    def test_serialize_ndarray_preserves_dtype_and_shape(self):
+        for arr in [
+            np.arange(6, dtype=np.int32).reshape(2, 3),
+            np.array([[1.5, 2.5]], dtype=np.float32),
+            np.array([True, False, True]),
+            np.array([1 + 2j, 3 - 4j]),
+        ]:
+            restored = _deserialize_data(_serialize_data(arr))
+            assert restored.dtype == arr.dtype
+            assert restored.shape == arr.shape
+            assert np.array_equal(restored, arr)
+
+    def test_deserialized_ndarray_is_writable(self):
+        # np.frombuffer returns a read-only view; the decoder must copy.
+        restored = _deserialize_data(_serialize_data(np.zeros(3)))
+        restored[0] = 1.0  # must not raise
+        assert restored[0] == 1.0
+
+    def test_serialize_unknown_type_is_refused_not_pickled(self):
+        # Anything without a safe JSON encoding becomes an 'unsupported'
+        # placeholder. It must NOT be pickled — see TDEC-009 / audit A-01.
+        serialized = _serialize_data(complex(3, 4))
+        assert serialized['__type__'] == 'unsupported'
+        assert 'complex' in serialized['__class__']
+
+        notes = []
+        assert _deserialize_data(serialized, notes) is None
+        assert notes and 'complex' in notes[0]
+
+    def test_serialize_object_dtype_array_is_refused(self):
+        arr = np.array([{'a': 1}, 'text'], dtype=object)
+        serialized = _serialize_data(arr)
+        assert serialized['__type__'] == 'unsupported'
 
     def test_deserialize_plain_dict(self):
         assert _deserialize_data({'key': 'value'}) == {'key': 'value'}
@@ -633,6 +660,116 @@ class TestSerializeDeserialize:
 
     def test_deserialize_scalar(self):
         assert _deserialize_data(42) == 42
+
+
+_UNPICKLE_CANARY = []
+
+
+def _trip_canary(value):
+    """Module-level so pickle can reference it by name. Records execution."""
+    _UNPICKLE_CANARY.append(value)
+    return value
+
+
+class _CanaryPayload:
+    """Pickles to a call of :func:`_trip_canary` — stands in for a malicious
+    ``__reduce__`` returning ``os.system``. ``__reduce__`` runs at dump time,
+    so the side effect must live in the *returned callable*, not in
+    ``__reduce__`` itself.
+    """
+
+    def __reduce__(self):
+        return (_trip_canary, ('EXECUTED',))
+
+
+class TestSessionDeserializationIsSafe:
+    """Regression tests for audit A-01 — session files must never unpickle.
+
+    ``load_session_from_file`` is reachable from the Export page's file
+    uploader, so a pickle-based decoder would make opening a shared session
+    file equivalent to executing its author's code.
+    """
+
+    def test_session_state_module_does_not_import_pickle(self):
+        import plottle.utils.session_state as ss
+
+        assert not hasattr(ss, 'pickle'), (
+            'session_state must not import pickle — it is reachable from an upload'
+        )
+
+    def test_legacy_pickled_entry_is_refused(self):
+        import base64
+        import pickle
+
+        _UNPICKLE_CANARY.clear()
+        blob = base64.b64encode(pickle.dumps(_CanaryPayload())).decode()
+
+        # Sanity-check that the payload really would execute if unpickled,
+        # so a green test cannot mean "the canary was inert".
+        assert pickle.loads(base64.b64decode(blob)) == 'EXECUTED'
+        assert _UNPICKLE_CANARY == ['EXECUTED']
+        _UNPICKLE_CANARY.clear()
+
+        notes = []
+        assert _deserialize_data({'__type__': 'pickled', '__data__': blob}, notes) is None
+        assert notes and 'refused' in notes[0]
+        assert _UNPICKLE_CANARY == [], 'the decoder executed a pickle payload'
+
+    def test_legacy_pickle_encoded_ndarray_is_refused(self):
+        # Pre-2.0.2 ndarray entries carried a pickle blob and no __dtype__.
+        import base64
+        import pickle
+
+        blob = base64.b64encode(pickle.dumps(np.zeros(3))).decode()
+        notes = []
+        assert _deserialize_data({'__type__': 'ndarray', '__data__': blob}, notes) is None
+        assert notes
+
+    def test_truncated_buffer_is_rejected(self):
+        serialized = _serialize_data(np.arange(10, dtype=np.float64))
+        serialized['__shape__'] = [11]  # claim more elements than the buffer holds
+        notes = []
+        assert _deserialize_data(serialized, notes) is None
+        assert notes and 'corrupt' in notes[0]
+
+    def test_object_dtype_on_decode_is_rejected(self):
+        notes = []
+        payload = {'__type__': 'ndarray', '__dtype__': '|O', '__shape__': [1], '__data__': ''}
+        assert _deserialize_data(payload, notes) is None
+        assert notes
+
+    def test_unrecognized_type_tag_is_refused(self):
+        notes = []
+        assert _deserialize_data({'__type__': 'something_new'}, notes) is None
+        assert notes
+
+    def test_load_reports_skipped_entries_and_clears_selection(
+        self, mock_session_state, tmp_path
+    ):
+        import base64
+        import json
+        import pickle
+
+        blob = base64.b64encode(pickle.dumps(np.zeros(3))).decode()
+        session = {
+            'version': '1.0',
+            'datasets': {'legacy.npy': {'__type__': 'pickled', '__data__': blob}},
+            'dataset_metadata': {},
+            'current_dataset': 'legacy.npy',
+            'plot_history': [],
+            'analysis_results': [],
+            'plot_config': {},
+        }
+        path = tmp_path / 'legacy_session.json'
+        path.write_text(json.dumps(session), encoding='utf-8')
+
+        skipped = load_session_from_file(str(path))
+
+        assert len(skipped) == 1
+        assert 'legacy.npy' in skipped[0]
+        assert 'legacy.npy' not in mock_session_state.datasets
+        # A dropped dataset must not remain the active selection.
+        assert mock_session_state.current_dataset is None
 
 
 # ============================================================================

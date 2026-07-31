@@ -24,18 +24,18 @@ import matplotlib.pyplot as plt
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.io import (
+from plottle.io import (
     save_pickle, load_pickle,
     save_numpy, load_numpy,
     save_dataframe, load_dataframe,
     save_data, load_data,
 )
-from modules.math import (
+from plottle.math import (
     calculate_statistics,
     fit_linear,
     fit_polynomial,
 )
-from modules.plotting import (
+from plottle.plotting import (
     histogram,
     line_plot,
     scatter_plot,

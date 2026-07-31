@@ -14,10 +14,10 @@ import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend
 import matplotlib.pyplot as plt
 
-# Add parent directory to path to import modules
+# Add parent directory to path to import plottle
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.plotting import (
+from plottle.plotting import (
     # Figure management
     create_figure, configure_axes, save_figure,
     # Core plots
@@ -473,7 +473,7 @@ def example_practical_workflow():
     )
 
     # Add linear fit line
-    from modules.math import fit_linear
+    from plottle.math import fit_linear
     fit_result = fit_linear(t_positive, log_C)
     y_fit = fit_result['slope'] * t_positive + fit_result['intercept']
     ax2.plot(t_positive, y_fit, 'r-', linewidth=2,

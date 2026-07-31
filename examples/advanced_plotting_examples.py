@@ -12,14 +12,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-# Add parent directory to path to import modules
+# Add parent directory to path to import plottle
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Set matplotlib to non-interactive backend
 import matplotlib
 matplotlib.use('Agg')
 
-from modules.plotting import (
+from plottle.plotting import (
     distribution_plot, box_plot, regression_plot,
     interactive_histogram, interactive_scatter, interactive_line,
     interactive_heatmap, interactive_3d_surface,

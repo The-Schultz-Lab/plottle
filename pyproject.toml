@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plottle"
-version = "2.0.1"
+dynamic = ["version"]
 description = "A general-purpose Python toolkit for scientific data visualization and analysis"
 readme = "README.md"
 license = "MIT"
@@ -25,7 +25,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
     "Topic :: Scientific/Engineering :: Chemistry",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.9,!=3.9.7"
 dependencies = [
     "numpy>=1.24.0",
     "scipy>=1.10.0",
@@ -33,29 +33,60 @@ dependencies = [
     "matplotlib>=3.7.0",
     "seaborn>=0.12.0",
     "plotly>=5.14.0",
-    "streamlit>=1.25.0",
+    "streamlit>=1.49.0",
     "openpyxl>=3.1.0",
     "PyYAML>=6.0",
+    # tomllib is stdlib from 3.11; needed by the Settings page on 3.9/3.10.
+    'tomli>=2.0.0; python_version < "3.11"',
 ]
 
 [project.optional-dependencies]
+# Optional instrument/scientific formats the GUI advertises. Installed by the
+# setup scripts so a student gets the documented 18 formats. See audit A-37.
+formats = [
+    "h5py>=3.0.0",
+    "xarray>=0.20.0",
+    "netcdf4>=1.6.0",
+]
+# NIST WebBook IR fetching (plottle.nist). Imported lazily with a helpful
+# message, so it is genuinely optional rather than a hard dependency.
+nist = [
+    "requests>=2.28.0",
+]
 docs = [
     "sphinx>=7.0.0",
     "furo>=2024.1.29",
 ]
-dev = [
+# Only what running the test suite needs. Deliberately separate from `dev`: the test
+# matrix spans Python 3.9-3.12, and the lint tools pinned in `dev` have their own,
+# higher Python floors (mypy 2.3 requires >=3.10). Installing `dev` in the test job
+# made the Python 3.9 cell fail while resolving lint tooling it never runs.
+# The test matrix must install `[test,...]`, never `[dev,...]`.
+test = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
-    "ruff>=0.4.0",
-    "mypy>=1.5.0",
+]
+dev = [
+    "plottle[test]",
+    # ruff and mypy are pinned exactly: both gate CI, and both add new checks in
+    # minor releases, so an unpinned floor means CI can turn red with no code
+    # change. Dependabot's `dev-tools` group bumps these. See audit A-10.
+    # NOTE: these pins constrain the Python versions `dev` can install on. Keep them
+    # out of anything the 3.9 test cell installs.
+    "ruff==0.16.1",
+    "mypy==2.3.0",
     "types-PyYAML>=6.0.0",
     "types-requests>=2.28.0",
     "build>=1.0.0",
     "twine>=5.0.0",
 ]
+# Everything a user (not a contributor) might want, in one extra.
+all = [
+    "plottle[formats,nist]",
+]
 
 [project.scripts]
-plottle = "cli:main"
+plottle = "plottle.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/The-Schultz-Lab/plottle"
@@ -64,12 +95,26 @@ Documentation = "https://nccu-schultz-lab.github.io/plottle/"
 "Bug Tracker" = "https://github.com/The-Schultz-Lab/plottle/issues"
 Changelog = "https://github.com/The-Schultz-Lab/plottle/blob/main/CHANGELOG.md"
 
-[tool.setuptools]
-py-modules = ["cli"]
+# Single source of truth: plottle/__init__.py. See audit A-26.
+[tool.setuptools.dynamic]
+version = {attr = "plottle.__version__"}
+
+# Runtime assets must be declared explicitly or the wheel ships only .py files,
+# leaving a pip-installed GUI with no logo, theme, example data or gallery.
+# See audit A-09 / mediator G-012.
+[tool.setuptools.package-data]
+plottle = [
+    "assets/*.png",
+    "assets/*.ico",
+    "gallery/*.png",
+    "gallery/manifest.json",
+    "example-data/Artificial/*.csv",
+    "example-data/Artificial/*.npy",
+]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["modules*"]
+include = ["plottle*"]
 
 [tool.ruff]
 line-length = 100
@@ -80,8 +125,8 @@ select = ["E", "F", "W"]
 ignore = []
 
 [tool.ruff.lint.per-file-ignores]
-"modules/pages/*.py" = ["E402"]
-"modules/Home.py" = ["E402"]
+"plottle/pages/*.py" = ["E402"]
+"plottle/Home.py" = ["E402"]
 
 [tool.black]
 line-length = 100
@@ -95,8 +140,8 @@ explicit_package_bases = true
 
 [tool.coverage.run]
 omit = [
-    "modules/Home.py",
-    "modules/pages/*",
+    "plottle/Home.py",
+    "plottle/pages/*",
 ]
 
 [tool.pytest.ini_options]

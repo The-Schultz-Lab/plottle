@@ -3,7 +3,7 @@
 import os
 import sys
 
-# Point Sphinx to the repo root so autodoc can import modules.*
+# Point Sphinx to the repo root so autodoc can import plottle.*
 sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -------------------------------------------------------
@@ -11,8 +11,14 @@ sys.path.insert(0, os.path.abspath(".."))
 project = "Plottle"
 copyright = "2026, Jonathan D. Schultz, PhD — NCCU Department of Chemistry and Biochemistry"
 author = "Jonathan D. Schultz, PhD"
-release = "2.0.0"
-version = "2.0"
+# Read the version from the package so it cannot drift from pyproject.toml.
+_version_ns: dict = {}
+for _line in open(os.path.join("..", "plottle", "__init__.py"), encoding="utf-8"):
+    if _line.startswith("__version__"):
+        exec(_line, _version_ns)  # noqa: S102 -- a single literal assignment
+        break
+release = _version_ns["__version__"]
+version = ".".join(release.split(".")[:2])
 
 # -- General configuration -----------------------------------------------------
 

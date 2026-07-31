@@ -12,7 +12,7 @@ seaborn>=0.12.0
 plotly>=5.14.0
 
 # GUI Framework
-streamlit>=1.25.0
+streamlit>=1.49.0   # floor set by width="stretch" widgets + st.Page/st.navigation
 
 # Development and Testing
 pytest>=7.4.0
@@ -25,6 +25,9 @@ types-requests>=2.28.0
 
 # Excel support for Pandas
 openpyxl>=3.1.0
+
+# TOML reader for the Settings page (stdlib tomllib from Python 3.11)
+tomli>=2.0.0; python_version < "3.11"
 
 # HTTP requests (used by NIST WebBook integration)
 requests>=2.28.0

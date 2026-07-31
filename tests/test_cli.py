@@ -6,6 +6,7 @@ statistics, batch processing, and data conversion.
 
 import pytest
 import subprocess
+import sys
 import json
 from pathlib import Path
 import tempfile
@@ -47,10 +48,15 @@ def run_cli(*args):
     result : CompletedProcess
         subprocess result with returncode, stdout, stderr
     """
-    cmd = ['python', 'cli.py'] + list(args)
+    # Use sys.executable, not a bare 'python': inside a virtualenv (or a tox /
+    # CI matrix cell) 'python' resolves via PATH to an interpreter that does not
+    # have the project's dependencies installed, and every one of these tests
+    # fails with ModuleNotFoundError. See G-016 / audit A-11a.
+    repo_root = Path(__file__).resolve().parent.parent
+    cmd = [sys.executable, '-m', 'plottle.cli'] + list(args)
     result = subprocess.run(
         cmd,
-        cwd=Path(__file__).parent.parent,
+        cwd=repo_root,
         capture_output=True,
         text=True
     )
@@ -73,10 +79,17 @@ class TestBasicCLI:
         assert 'stats' in result.stdout
 
     def test_version(self):
-        """Test that --version displays version."""
+        """Test that --version reports the packaged version.
+
+        Asserts against ``plottle.__version__`` rather than a hardcoded string:
+        this test previously asserted '1.0.0' and went stale unnoticed because
+        CI never ran tests/test_cli.py. See audit A-11 / A-26.
+        """
+        from plottle import __version__
+
         result = run_cli('--version')
         assert result.returncode == 0
-        assert '1.0.0' in result.stdout or '1.0.0' in result.stderr
+        assert __version__ in result.stdout or __version__ in result.stderr
 
     def test_examples(self):
         """Test that --examples displays usage examples."""

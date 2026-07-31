@@ -189,19 +189,19 @@ fig.tight_layout()
 
 ```bash
 # Quick plot from CSV
-python cli.py plot data.csv --type line --xcol time --ycol signal --output fig.png
+plottle plot data.csv --type line --xcol time --ycol signal --output fig.png
 
 # Compute statistics
-python cli.py stats data.csv --column signal
+plottle stats data.csv --column signal
 
 # Batch processing from config
-python cli.py batch config.json
+plottle batch config.json
 
 # Convert file formats
-python cli.py convert data.csv output.pkl
+plottle convert data.csv output.pkl
 
 # Show examples
-python cli.py --examples
+plottle --examples
 ```
 
 ---

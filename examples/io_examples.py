@@ -12,10 +12,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-# Add parent directory to path to import modules
+# Add parent directory to path to import plottle
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.io import (
+from plottle.io import (
     load_pickle, save_pickle,
     load_numpy, save_numpy,
     load_dataframe, save_dataframe,

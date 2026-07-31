@@ -10,5 +10,5 @@ if not exist .venv (
 )
 
 call .venv\Scripts\activate.bat
-streamlit run modules/Home.py
+streamlit run plottle/Home.py
 pause

@@ -15,7 +15,7 @@ Jupyter required — everything runs from a terminal.
 source .venv/bin/activate
 
 # Verify the CLI is available
-python cli.py --help
+plottle --help
 ```
 
 ---
@@ -27,7 +27,7 @@ The `plot` command reads a CSV (or any supported format) and produces a figure.
 ### Quickest example — scatter from CSV
 
 ```bash
-python cli.py plot examples/data/experimental_data.csv \
+plottle plot examples/data/experimental_data.csv \
     --plot scatter \
     --x-column x \
     --y-column y \
@@ -48,7 +48,7 @@ python cli.py plot examples/data/experimental_data.csv \
 ### Publication-quality line plot
 
 ```bash
-python cli.py plot examples/data/experimental_data.csv \
+plottle plot examples/data/experimental_data.csv \
     --plot line \
     --x-column wavelength \
     --y-column absorbance \
@@ -62,7 +62,7 @@ python cli.py plot examples/data/experimental_data.csv \
 ### Histogram of a single column
 
 ```bash
-python cli.py plot examples/data/experimental_data.csv \
+plottle plot examples/data/experimental_data.csv \
     --plot histogram \
     --y-column signal \
     --title "Signal Distribution" \
@@ -74,7 +74,7 @@ python cli.py plot examples/data/experimental_data.csv \
 ## Command 2 — `stats`: Compute Summary Statistics
 
 ```bash
-python cli.py stats examples/data/experimental_data.csv
+plottle stats examples/data/experimental_data.csv
 ```
 
 Output example:
@@ -95,13 +95,13 @@ Statistics for experimental_data.csv
 ### Stats for a specific column
 
 ```bash
-python cli.py stats examples/data/experimental_data.csv --column absorbance
+plottle stats examples/data/experimental_data.csv --column absorbance
 ```
 
 ### Normality test
 
 ```bash
-python cli.py stats examples/data/experimental_data.csv --normality
+plottle stats examples/data/experimental_data.csv --normality
 ```
 
 ---
@@ -112,16 +112,16 @@ Convert between any of the eight supported formats:
 
 ```bash
 # CSV  →  pickle (preserves dtypes)
-python cli.py convert examples/data/experimental_data.csv output/data.pkl
+plottle convert examples/data/experimental_data.csv output/data.pkl
 
 # CSV  →  NumPy binary
-python cli.py convert examples/data/experimental_data.csv output/data.npy
+plottle convert examples/data/experimental_data.csv output/data.npy
 
 # NumPy  →  CSV
-python cli.py convert examples/data/auto_test.npy output/array.csv
+plottle convert examples/data/auto_test.npy output/array.csv
 
 # Excel  →  Parquet (smaller, faster to load)
-python cli.py convert examples/data/experimental_data.xlsx output/data.parquet
+plottle convert examples/data/experimental_data.xlsx output/data.parquet
 ```
 
 Supported extensions: `.csv`, `.xlsx`, `.tsv`, `.json`, `.npy`, `.npz`, `.pkl`, `.parquet`
@@ -133,7 +133,7 @@ Supported extensions: `.csv`, `.xlsx`, `.tsv`, `.json`, `.npy`, `.npz`, `.pkl`, 
 Compare two or more files on the same axes:
 
 ```bash
-python cli.py compare \
+plottle compare \
     examples/data/experimental_data.csv \
     examples/data/md_analysis.csv \
     --plot line \
@@ -146,7 +146,7 @@ Each file becomes a separate series. Labels default to the filenames; use `--lab
 override:
 
 ```bash
-python cli.py compare file1.csv file2.csv \
+plottle compare file1.csv file2.csv \
     --plot scatter \
     --labels "Experiment A" "Experiment B" \
     --output output/comparison.png
@@ -188,9 +188,9 @@ For reproducible multi-plot workflows, define all jobs in a JSON config file.
 ### Running a batch job
 
 ```bash
-python cli.py batch examples/batch_config.json
+plottle batch examples/batch_config.json
 # With verbose output:
-python cli.py batch examples/batch_config.json --verbose
+plottle batch examples/batch_config.json --verbose
 ```
 
 A full example config is at [examples/batch_config.json](../../examples/batch_config.json).

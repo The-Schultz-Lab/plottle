@@ -16,7 +16,7 @@ matplotlib.use("Agg")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.plotting import (
+from plottle.plotting import (
     interactive_histogram,
     interactive_scatter,
     interactive_line,

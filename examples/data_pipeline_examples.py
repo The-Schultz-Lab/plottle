@@ -1,7 +1,7 @@
 """Examples for data I/O pipeline and format conversion.
 
 Demonstrates the full load → process → save pipeline using all 8 formats
-supported by modules.io.
+supported by plottle.io.
 
 Run from the repo root:
     python examples/data_pipeline_examples.py
@@ -18,9 +18,9 @@ matplotlib.use("Agg")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from modules.io import load_data, save_data
-from modules.math import calculate_statistics
-from modules.plotting import histogram, save_figure
+from plottle.io import load_data, save_data
+from plottle.math import calculate_statistics
+from plottle.plotting import histogram, save_figure
 
 OUTPUT_DIR = Path(__file__).parent / "plots"
 OUTPUT_DIR.mkdir(exist_ok=True)
