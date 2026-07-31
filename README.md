@@ -12,7 +12,7 @@ Plottle provides a unified interface for scientific data work:
 
 - **Data I/O** — 18 file formats (CSV, Excel, TSV, JSON, Parquet, NumPy, Pickle, JCAMP-DX, HDF5, NetCDF, SPC, ASC, mzML/mzXML, and more)
 - **Mathematical analysis** — statistics, curve fitting, signal processing, peak analysis, hypothesis testing, optimization, linear algebra
-- **Multi-library plotting** — 26 plot types across Matplotlib (static), Seaborn (statistical), and Plotly (interactive)
+- **Multi-library plotting** — 27 plot types across Matplotlib (static), Seaborn (statistical), and Plotly (interactive)
 - **14-page Streamlit GUI** — exploratory data analysis without writing code
 - **CLI** — batch processing and scripted workflows
 - **Plugin system** — drop `plugin_*.py` into `plugins/` for custom plot types and tools
@@ -76,7 +76,7 @@ without installing, use `python -m plottle.cli` instead.
 | --- | --- |
 | **Home** | Dashboard overview and help tabs |
 | **1 — Data Upload** | Upload files in 18 formats; preview shape, column types, and summary statistics; batch folder import |
-| **2 — Quick Plot** | 26 plot types with live style controls, annotation panel, and Convert to Plotly toggle |
+| **2 — Quick Plot** | 27 plot types with live style controls, annotation panel, and Convert to Plotly toggle |
 | **3 — Analysis Tools** | 8 tabs: Statistics, Distribution, Curve Fit, Optimization, Linear Algebra, Signal Processing, Peak Analysis, Statistical Tests |
 | **4 — Multi-Plot Dashboard** | Up to 4×4 grid layouts with axis sharing and combined PNG/PDF export |
 | **5 — Advanced Plotting** | Seaborn statistical plots and Plotly interactive charts with HTML export |
@@ -140,7 +140,7 @@ save_figure(fig, 'spectrum.png', dpi=300)
 | --- | --- |
 | `plottle.io` | `load_data()` / `save_data()` — auto-detects format from extension |
 | `plottle.math` | 25 functions — statistics, curve fitting, hypothesis tests, optimization, linear algebra |
-| `plottle.plotting` | 26 plot types; Matplotlib → `(fig, ax, info)`, Plotly → `(fig, info)` |
+| `plottle.plotting` | 27 plot types; Matplotlib → `(fig, ax, info)`, Plotly → `(fig, info)` |
 | `plottle.signal` | 16 functions — smoothing, filtering, FFT, derivatives, baseline correction, interpolation |
 | `plottle.peaks` | 5 functions — find, integrate, FWHM, fit (Gaussian/Lorentzian/Voigt/pseudo-Voigt) |
 | `plottle.data_tools` | 12 non-destructive DataFrame operations |

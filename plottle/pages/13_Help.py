@@ -22,7 +22,7 @@ with tab_start:
     ## Workflow
 
     1. **Upload Data** — Go to *Data Upload* and upload a file, or load a built-in example dataset.
-    2. **Quick Plot** — Choose from 26 plot types, configure parameters interactively
+    2. **Quick Plot** — Choose from 27 plot types, configure parameters interactively
        in the sidebar.
     3. **Analysis Tools** — Statistical tests, curve fitting, signal processing,
        peak analysis, and more.
