@@ -57,12 +57,22 @@ docs = [
     "sphinx>=7.0.0",
     "furo>=2024.1.29",
 ]
-dev = [
+# Only what running the test suite needs. Deliberately separate from `dev`: the test
+# matrix spans Python 3.9-3.12, and the lint tools pinned in `dev` have their own,
+# higher Python floors (mypy 2.3 requires >=3.10). Installing `dev` in the test job
+# made the Python 3.9 cell fail while resolving lint tooling it never runs.
+# The test matrix must install `[test,...]`, never `[dev,...]`.
+test = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
+]
+dev = [
+    "plottle[test]",
     # ruff and mypy are pinned exactly: both gate CI, and both add new checks in
     # minor releases, so an unpinned floor means CI can turn red with no code
     # change. Dependabot's `dev-tools` group bumps these. See audit A-10.
+    # NOTE: these pins constrain the Python versions `dev` can install on. Keep them
+    # out of anything the 3.9 test cell installs.
     "ruff==0.16.1",
     "mypy==2.3.0",
     "types-PyYAML>=6.0.0",

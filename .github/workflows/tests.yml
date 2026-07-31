@@ -98,8 +98,11 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
 
+      # `[test,...]`, not `[dev,...]`: the lint tools pinned in `dev` have higher
+      # Python floors than this matrix spans (mypy 2.3 requires >=3.10), and the test
+      # job does not run them.
       - name: Install project and test dependencies
-        run: pip install -e ".[dev,formats,nist]"
+        run: pip install -e ".[test,formats,nist]"
 
       # Run the whole suite. This previously enumerated 15 files by hand and so never
       # ran tests/test_cli.py (27 tests, the entire CLI surface) or
