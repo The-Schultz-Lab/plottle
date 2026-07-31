@@ -17,10 +17,11 @@ import matplotlib.colors as mcolors
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union, cast
 
 if TYPE_CHECKING:
     import pandas as pd
+    from matplotlib.projections.polar import PolarAxes
 
 # Okabe-Ito colorblind-safe palette (8 colors)
 COLORBLIND_PALETTE: List[str] = [
@@ -252,9 +253,14 @@ def histogram(
 
     fig, ax = create_figure(figsize=figsize)
 
-    counts, bins, patches = ax.hist(
+    # matplotlib types `bins` as int | Sequence[float] | str | None; an ndarray of
+    # explicit edges is valid at runtime but not per the stub, so convert it.
+    _bins: Union[int, str, List[float], None] = (
+        [float(edge) for edge in bins] if isinstance(bins, np.ndarray) else bins
+    )
+    counts, bin_edges, patches = ax.hist(
         data,
-        bins=bins,
+        bins=_bins,
         color=color,
         alpha=alpha,
         density=density,
@@ -269,7 +275,7 @@ def histogram(
     # Calculate statistics
     info = {
         "counts": counts,
-        "bins": bins,
+        "bins": bin_edges,
         "mean": float(np.mean(data)),
         "std": float(np.std(data)),
     }
@@ -1207,8 +1213,11 @@ def polar_plot(
     theta_arr = np.asarray(theta, dtype=float)
     r_arr = np.asarray(r, dtype=float)
     fig, ax = plt.subplots(figsize=figsize, subplot_kw={"projection": "polar"})
-    ax.set_theta_zero_location(theta_zero_location)
-    ax.set_theta_direction(theta_direction)
+    # subplot_kw guarantees a PolarAxes at runtime; plt.subplots is typed as returning
+    # the base Axes, which has no set_theta_* methods.
+    polar_ax = cast("PolarAxes", ax)
+    polar_ax.set_theta_zero_location(theta_zero_location)
+    polar_ax.set_theta_direction(theta_direction)
     ax.plot(theta_arr, r_arr, color=color, linestyle=linestyle, linewidth=linewidth, **kwargs)
     if fill:
         ax.fill(theta_arr, r_arr, alpha=fill_alpha, color=color)

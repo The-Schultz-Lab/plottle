@@ -36,7 +36,7 @@ from __future__ import annotations
 import ast
 import math
 import operator
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -84,7 +84,7 @@ _SAFE_MATH = {
 # whitelists AST node types and rejects `ast.Attribute` outright.  Anything not
 # explicitly allowed raises ValueError rather than being evaluated.
 
-_BIN_OPS = {
+_BIN_OPS: Dict[type, Callable[[Any, Any], Any]] = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
     ast.Mult: operator.mul,
@@ -94,13 +94,13 @@ _BIN_OPS = {
     ast.Pow: operator.pow,
 }
 
-_UNARY_OPS = {
+_UNARY_OPS: Dict[type, Callable[[Any], Any]] = {
     ast.UAdd: operator.pos,
     ast.USub: operator.neg,
     ast.Not: operator.not_,
 }
 
-_COMPARE_OPS = {
+_COMPARE_OPS: Dict[type, Callable[[Any, Any], Any]] = {
     ast.Eq: operator.eq,
     ast.NotEq: operator.ne,
     ast.Lt: operator.lt,
@@ -185,20 +185,20 @@ def _safe_eval(expression: str, namespace: Dict[str, Any]) -> Any:
             return namespace[node.id]
 
         if isinstance(node, ast.BinOp):
-            op = _BIN_OPS.get(type(node.op))
-            if op is None:
+            bin_op = _BIN_OPS.get(type(node.op))
+            if bin_op is None:
                 raise ValueError(f"operator `{type(node.op).__name__}` is not allowed")
             left, right = _eval(node.left), _eval(node.right)
-            if op is operator.pow and isinstance(right, (int, float)):
+            if bin_op is operator.pow and isinstance(right, (int, float)):
                 if abs(right) > _MAX_POW_EXPONENT:
                     raise ValueError(f"exponent {right} exceeds the limit of {_MAX_POW_EXPONENT}")
-            return op(left, right)
+            return bin_op(left, right)
 
         if isinstance(node, ast.UnaryOp):
-            op = _UNARY_OPS.get(type(node.op))
-            if op is None:
+            unary_op = _UNARY_OPS.get(type(node.op))
+            if unary_op is None:
                 raise ValueError(f"operator `{type(node.op).__name__}` is not allowed")
-            return op(_eval(node.operand))
+            return unary_op(_eval(node.operand))
 
         if isinstance(node, ast.BoolOp):
             values = [_eval(v) for v in node.values]
@@ -211,11 +211,11 @@ def _safe_eval(expression: str, namespace: Dict[str, Any]) -> Any:
             result = None
             left = _eval(node.left)
             for op_node, comparator_node in zip(node.ops, node.comparators):
-                op = _COMPARE_OPS.get(type(op_node))
-                if op is None:
+                cmp_op = _COMPARE_OPS.get(type(op_node))
+                if cmp_op is None:
                     raise ValueError(f"comparison `{type(op_node).__name__}` is not allowed")
                 right = _eval(comparator_node)
-                outcome = op(left, right)
+                outcome = cmp_op(left, right)
                 result = outcome if result is None else (result & outcome)
                 left = right
             return result

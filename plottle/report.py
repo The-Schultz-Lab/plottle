@@ -62,7 +62,7 @@ def _make_title_page(
         A matplotlib Figure (caller is responsible for closing it).
     """
     fig = plt.figure(figsize=(8.5, 11), facecolor="white")
-    ax = fig.add_axes([0, 0, 1, 1])
+    ax = fig.add_axes((0.0, 0.0, 1.0, 1.0))
     ax.set_axis_off()
 
     # Decorative horizontal rules
@@ -200,7 +200,7 @@ def _dataframe_to_figure(
     row_height = 0.35
     fig_height = max(3.0, min(14.0, 1.5 + n_rows * row_height))
     fig = plt.figure(figsize=(11, fig_height), facecolor="white")
-    ax = fig.add_axes([0.02, 0.02, 0.96, 0.96])
+    ax = fig.add_axes((0.02, 0.02, 0.96, 0.96))
     ax.set_axis_off()
 
     # Title
@@ -273,7 +273,7 @@ def _analysis_result_to_figure(result: dict) -> Figure:
         A matplotlib Figure (caller is responsible for closing it).
     """
     fig = plt.figure(figsize=(8.5, 6), facecolor="white")
-    ax = fig.add_axes([0.05, 0.05, 0.90, 0.90])
+    ax = fig.add_axes((0.05, 0.05, 0.90, 0.90))
     ax.set_axis_off()
 
     r_type = result.get("type", "analysis")

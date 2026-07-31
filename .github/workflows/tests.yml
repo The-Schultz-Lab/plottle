@@ -6,8 +6,18 @@ on:
   pull_request:
     branches: [main]
 
+# Read-only is all either job needs.
+permissions:
+  contents: read
+
+# Superseding pushes cancel in-flight runs instead of queueing behind them.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
+    name: Lint and type-check
     runs-on: ubuntu-latest
 
     steps:
@@ -17,9 +27,16 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
 
-      - name: Install lint tools
-        run: pip install ruff mypy types-PyYAML types-requests
+      # Install the project itself, not just the lint tools. Previously this job
+      # installed only `ruff mypy types-*`, so numpy/pandas/matplotlib/streamlit were
+      # all absent and --ignore-missing-imports collapsed them to `Any` -- mypy was
+      # reporting "Success" while checking almost nothing. ruff and mypy are pinned in
+      # the dev extra so a tool release cannot turn CI red on its own. See audit A-10.
+      - name: Install project and dev tooling
+        run: pip install -e ".[dev,formats,nist]"
 
       - name: ruff check
         run: ruff check plottle/
@@ -46,45 +63,57 @@ jobs:
             --ignore-missing-imports --no-strict-optional --explicit-package-bases
 
   test:
-    runs-on: ubuntu-latest
+    name: Tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      # One failing cell should not hide the others -- knowing whether a break is
+      # version-specific or universal is most of the diagnosis.
+      fail-fast: false
+      matrix:
+        # pyproject declares requires-python = ">=3.9,!=3.9.7" and classifiers for
+        # 3.9-3.12, so every one of those is tested. Testing only 3.11 is what let
+        # G-010 (st.Page on 3.9) and the tomllib import in the Settings page (3.11+
+        # stdlib) reach users. See audit A-12.
+        os: [ubuntu-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        include:
+          # Non-Linux spot checks: the setup/launch scripts target macOS and Windows.
+          # Note macOS runners are arm64 and actions/setup-python has no 3.9 build for
+          # them, so the exact G-010 combination (macOS + 3.9) needs an Intel runner.
+          # Until then it is covered by ubuntu 3.9 plus the absolute-path assertions in
+          # tests/test_gui_paths.py, which are OS-independent.
+          - os: macos-latest
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.11"
 
     steps:
       - uses: actions/checkout@v6
 
-      - name: Set up Python 3.11
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install project and test dependencies
+        run: pip install -e ".[dev,formats,nist]"
 
-      - name: Run tests with coverage
+      # Run the whole suite. This previously enumerated 15 files by hand and so never
+      # ran tests/test_cli.py (27 tests, the entire CLI surface) or
+      # tests/test_integration.py (14 tests) -- a hand-maintained list gives no signal
+      # when it falls behind. See audit A-11.
+      - name: Run tests
         env:
           MPLBACKEND: Agg
-        run: |
-          pytest \
-            tests/test_io.py \
-            tests/test_math.py \
-            tests/test_plotting.py \
-            tests/test_plotting_advanced.py \
-            tests/test_utils.py \
-            tests/test_signal.py \
-            tests/test_peaks.py \
-            tests/test_data_tools.py \
-            tests/test_annotations.py \
-            tests/test_spectroscopy.py \
-            tests/test_molecular_parsers.py \
-            tests/test_batch.py \
-            tests/test_report.py \
-            tests/test_plugin_loader.py \
-            tests/test_nist.py \
-            --cov=plottle \
-            --cov-report=xml \
-            --cov-report=term-missing \
-            -v
+        run: pytest tests/ --cov=plottle --cov-report=xml --cov-report=term-missing -v
 
+      # One cell only: with a matrix, every job uploading the same artifact name is an
+      # error on upload-artifact v4+.
       - name: Upload coverage report
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
         uses: actions/upload-artifact@v7
         with:
           name: coverage-report
