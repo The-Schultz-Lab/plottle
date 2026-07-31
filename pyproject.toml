@@ -86,6 +86,19 @@ Changelog = "https://github.com/The-Schultz-Lab/plottle/blob/main/CHANGELOG.md"
 [tool.setuptools.dynamic]
 version = {attr = "plottle.__version__"}
 
+# Runtime assets must be declared explicitly or the wheel ships only .py files,
+# leaving a pip-installed GUI with no logo, theme, example data or gallery.
+# See audit A-09 / mediator G-012.
+[tool.setuptools.package-data]
+plottle = [
+    "assets/*.png",
+    "assets/*.ico",
+    "gallery/*.png",
+    "gallery/manifest.json",
+    "example-data/Artificial/*.csv",
+    "example-data/Artificial/*.npy",
+]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["plottle*"]

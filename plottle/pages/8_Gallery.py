@@ -19,8 +19,10 @@ from pathlib import Path
 
 import streamlit as st
 
-_APP_ROOT = Path(__file__).parent.parent.parent
-_GALLERY_DIR = _APP_ROOT / "docs" / "gallery"
+_APP_ROOT = Path(__file__).resolve().parent.parent.parent
+# Packaged alongside the code so the Gallery is populated after `pip install`
+# rather than only in a source checkout -- see audit A-09.
+_GALLERY_DIR = Path(__file__).resolve().parent.parent / "gallery"
 _MANIFEST_PATH = _GALLERY_DIR / "manifest.json"
 
 sys.path.insert(0, str(_APP_ROOT))

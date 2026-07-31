@@ -23,9 +23,10 @@ import traceback
 import numpy as np
 import pandas as pd
 
-# Resolve the repo root so we can find example datasets
-_APP_ROOT = Path(__file__).parent.parent.parent
-_EXAMPLE_DIR = _APP_ROOT / "example-data" / "Artificial"
+_APP_ROOT = Path(__file__).resolve().parent.parent.parent
+# Example datasets ship inside the package so this tab works after
+# `pip install` -- see audit A-09.
+_EXAMPLE_DIR = Path(__file__).resolve().parent.parent / "example-data" / "Artificial"
 
 # Metadata for each built-in example file
 _EXAMPLES = {
@@ -212,7 +213,7 @@ with tab2:
     if not _EXAMPLE_DIR.exists():
         st.warning(
             f"Example data directory not found: `{_EXAMPLE_DIR}`. "
-            "Run `generate_examples.py` in `example-data/Artificial/` first."
+            "Run `python generate_examples.py` from the repository root first."
         )
     else:
         st.markdown(

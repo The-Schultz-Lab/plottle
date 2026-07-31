@@ -185,12 +185,13 @@ See [`requirements.txt`](requirements.txt) for pinned version ranges.
 ## Project Structure
 
 ```text
-plottle/
-├── modules/
+plottle/                            ← repository root
+├── plottle/                        ← the installable package
 │   ├── Home.py                     ← Streamlit entry point
+│   ├── cli.py                      ← CLI entry point (5 subcommands)
 │   ├── io.py                       ← 18-format data loader/saver
 │   ├── math.py                     ← 25 analysis functions
-│   ├── plotting.py                 ← 26 plot types (Matplotlib, Seaborn, Plotly)
+│   ├── plotting.py                 ← 27 plot types (Matplotlib, Seaborn, Plotly)
 │   ├── signal.py                   ← 16 signal processing functions
 │   ├── peaks.py                    ← 5 peak analysis functions
 │   ├── data_tools.py               ← 12 non-destructive DataFrame operations
@@ -202,19 +203,23 @@ plottle/
 │   ├── plugin_loader.py            ← plugin discovery and loading
 │   ├── molecular/                  ← CPK atom data + vibrational parsers
 │   ├── pages/                      ← 13 Streamlit pages (1_*.py – 14_*.py)
-│   └── utils/                      ← session state, plot config, user settings
-├── plottle/cli.py                          ← CLI entry point (5 subcommands)
-├── tests/                          ← 17 test files, 900+ tests
+│   ├── utils/                      ← session state, plot config, user settings
+│   ├── assets/                     ← logo + NCCU branding (shipped in the wheel)
+│   ├── gallery/                    ← pre-rendered gallery PNGs + manifest.json
+│   └── example-data/Artificial/    ← built-in sample datasets
+├── tests/                          ← 17 test files, 950+ tests
 ├── plugins/                        ← plugin_example.py starter template
 ├── examples/                       ← 15+ standalone scripts + batch_config.json
-├── notebooks/                      ← 4 Jupyter tutorials (Binder-ready)
-├── docs/                           ← tutorials, gallery, cheatsheet
-├── example-data/                   ← generated sample datasets
+├── docs/                           ← tutorials, cheatsheet, Sphinx sources
+├── generate_gallery.py             ← regenerates plottle/gallery/
 ├── requirements.txt
 ├── pyproject.toml
 ├── setup.bat / setup.command       ← First-run setup (Windows / macOS — double-click)
 └── launch.bat / launch.command     ← App launcher (Windows / macOS — double-click)
 ```
+
+Runtime assets (`assets/`, `gallery/`, `example-data/`) live **inside** the package
+rather than at the repository root, so they are present after `pip install`.
 
 ## Documentation
 

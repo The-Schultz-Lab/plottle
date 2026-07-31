@@ -37,8 +37,12 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
 _PAGES_DIR = Path(__file__).resolve().parent / "pages"
-_LOGO_PNG = _REPO_ROOT / "logo.png"
-_ASSETS_DIR = _REPO_ROOT / "assets"
+
+# Assets are inside the package (not at the repo root) so that they survive
+# `pip install` -- see audit A-09. Resolving them relative to the repo root meant
+# a pip-installed GUI came up with no logo and no NCCU branding.
+_ASSETS_DIR = Path(__file__).resolve().parent / "assets"
+_LOGO_PNG = _ASSETS_DIR / "logo.png"
 _NCCU_HORIZ = _ASSETS_DIR / "nccu-horiz-logo.png"
 _NCCU_WINGS = _ASSETS_DIR / "nccu-wings.png"
 

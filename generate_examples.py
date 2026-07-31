@@ -13,7 +13,8 @@ import pandas as pd
 from pathlib import Path
 
 rng = np.random.default_rng(42)
-OUT = Path(__file__).parent
+OUT = Path(__file__).resolve().parent / "plottle" / "example-data" / "Artificial"
+OUT.mkdir(parents=True, exist_ok=True)
 
 
 # ── 1. Normal distribution (Histogram, Distribution, Interactive Histogram) ──
