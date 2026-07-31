@@ -12,9 +12,16 @@ Sections
 """
 
 import json
-import tomllib
 from pathlib import Path
 import sys
+
+# `tomllib` entered the stdlib in Python 3.11, but Plottle supports 3.9+.
+# Without this fallback the whole page raises ModuleNotFoundError on 3.9/3.10
+# while every other page works — see G-013 / audit A-04.
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python 3.9 / 3.10
+    import tomli as tomllib
 
 import streamlit as st
 

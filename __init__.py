@@ -29,6 +29,7 @@ Examples
 >>> fig, ax, info = histogram(data['value'], bins=30)
 """
 
-__version__ = "2.0.0"
+from modules import __version__  # noqa: F401  (re-exported for convenience)
+
 __author__ = "Jonathan D. Schultz, PhD — North Carolina Central University"
 __all__ = ["modules"]

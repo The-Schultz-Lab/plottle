@@ -44,6 +44,7 @@ import numpy as np
 import pandas as pd
 
 # Import module functions
+from modules import __version__
 from modules.io import load_data, save_data
 from modules.math import calculate_statistics, check_normality
 from modules.plotting import (
@@ -514,7 +515,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
 
-    parser.add_argument("--version", action="version", version="Plottle 2.0.0")
+    parser.add_argument("--version", action="version", version=f"Plottle {__version__}")
 
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose output")
 

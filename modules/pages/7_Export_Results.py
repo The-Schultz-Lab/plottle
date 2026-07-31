@@ -393,9 +393,21 @@ with tab_load:
                 tmp_path = tmp.name
 
             try:
-                load_session_from_file(tmp_path)
-                st.success("Session restored. Navigate to other pages to use the loaded data.")
-                st.rerun()
+                skipped = load_session_from_file(tmp_path)
+                if skipped:
+                    # Deliberately no st.rerun() here — a rerun would discard this
+                    # warning before the user ever sees it. The data is already in
+                    # session state, so navigating to another page picks it up.
+                    st.warning(
+                        "Session restored, but some entries could not be loaded:\n\n"
+                        + "\n".join(f"- {note}" for note in skipped)
+                        + "\n\nSessions saved by Plottle 2.0.1 or earlier stored arrays in a "
+                        "format that is no longer accepted. Re-upload the original data files "
+                        "and save the session again."
+                    )
+                else:
+                    st.success("Session restored. Navigate to other pages to use the loaded data.")
+                    st.rerun()
             except Exception as exc:
                 st.error(f"Could not load session: {exc}")
             finally:

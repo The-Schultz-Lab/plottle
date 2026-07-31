@@ -117,10 +117,13 @@ st.caption("Load datasets from file, examples, or a folder.")
 tab1, tab2, tab3 = st.tabs(["Upload File", "Example Datasets", "Batch Import"])
 
 with tab1:
+    # NOTE: `pkl` is deliberately absent. Unpickling an uploaded file executes
+    # code contained in it, and a user clicking "Browse files" has not consented
+    # to that. `plottle.io.load_pickle()` remains available in the Python API,
+    # where the caller has chosen to trust the file. See TDEC-011 / audit A-16.
     uploaded_file = st.file_uploader(
         "Choose a data file",
         type=[
-            "pkl",
             "npy",
             "npz",
             "csv",
@@ -141,6 +144,11 @@ with tab1:
             "mzxml",
         ],
         help="Upload a data file in any supported format",
+    )
+    st.caption(
+        "Pickle (`.pkl`) files are not accepted here — loading one runs any code it "
+        "contains. Use `plottle.io.load_pickle()` from Python if you trust the file, "
+        "or re-save your data as CSV or Parquet."
     )
 
     if uploaded_file is not None:
@@ -275,6 +283,7 @@ with tab3:
         key="batch_folder_path",
         help="Absolute path to the directory containing your data files.",
     )
+    # `pkl` is deliberately absent here too — see the note on the uploader above.
     _all_exts = [
         "csv",
         "xlsx",
@@ -282,7 +291,6 @@ with tab3:
         "tsv",
         "json",
         "parquet",
-        "pkl",
         "npy",
         "npz",
         "jdx",

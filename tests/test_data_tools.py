@@ -109,8 +109,133 @@ class TestAddFormulaColumn:
             add_formula_column(simple_df, "  ", "x + 1")
 
     def test_bad_expression_raises(self, simple_df):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError, match="unknown name 'undefined_var'"):
             add_formula_column(simple_df, "bad", "undefined_var + 1")
+
+    def test_syntax_error_raises_valueerror(self, simple_df):
+        with pytest.raises(ValueError, match="could not parse expression"):
+            add_formula_column(simple_df, "bad", "x +* 2")
+
+
+class TestFormulaExpressionSandbox:
+    """Regression tests for audit A-02 — the formula evaluator must not expose
+    the Python runtime.
+
+    Expressions come from a text input in the GUI, so they are untrusted. The
+    previous implementation used ``eval(expr, {"__builtins__": {}}, ns)``, which
+    is escapable by walking the type hierarchy to reach an importer. Every known
+    escape route requires attribute access or an indirect call, so both are
+    rejected. See TDEC-010.
+    """
+
+    # The exact escape that was reproduced against the old implementation.
+    _CLASSIC_ESCAPE = (
+        '[c for c in ().__class__.__bases__[0].__subclasses__() '
+        'if c.__name__=="BuiltinImporter"][0]().load_module("os").getcwd()'
+    )
+
+    @pytest.mark.parametrize(
+        "expression",
+        [
+            _CLASSIC_ESCAPE,
+            '().__class__.__bases__[0].__subclasses__()',
+            'x.__class__',
+            'x.values',
+            '__import__("os").system("id")',
+            'open("/etc/passwd").read()',
+            'eval("1+1")',
+            'exec("import os")',
+            'globals()',
+            'locals()',
+            'lambda: 1',
+            '[i for i in range(3)]',
+            '{i: i for i in range(3)}',
+            '(i for i in range(3))',
+            'x.__class__.__mro__[1]',
+        ],
+    )
+    def test_escape_attempts_are_refused(self, simple_df, expression):
+        with pytest.raises(ValueError):
+            add_formula_column(simple_df, "pwned", expression)
+
+    def test_attribute_access_is_rejected_with_a_clear_message(self, simple_df):
+        with pytest.raises(ValueError, match="attribute access"):
+            add_formula_column(simple_df, "bad", "x.mean")
+
+    def test_indirect_calls_are_rejected(self, simple_df):
+        # Calling the result of an expression is how attribute-free escapes are
+        # assembled, so only bare whitelisted names may be called. Note that
+        # `(log)(x)` is *not* indirect — parentheses add no AST node — so this
+        # uses a construct that genuinely yields a non-Name callee.
+        with pytest.raises(ValueError, match="only direct calls"):
+            add_formula_column(simple_df, "bad", "(log if True else exp)(x)")
+
+    def test_a_column_cannot_be_used_as_a_callee(self):
+        # Callees resolve against the function whitelist, never the namespace,
+        # so no column name can become callable.
+        df = pd.DataFrame({"mycol": [1.0, 2.0]})
+        with pytest.raises(ValueError, match="not a callable formula function"):
+            add_formula_column(df, "bad", "mycol(1)")
+
+    def test_column_named_like_a_function_shadows_only_the_value(self):
+        # A column named `log` is readable as data, while `log(...)` still
+        # resolves to numpy's log. Documents the precedence rather than
+        # asserting it is the only reasonable choice.
+        df = pd.DataFrame({"log": [1.0, np.e]})
+        result = add_formula_column(df, "out", "log(log)")
+        np.testing.assert_allclose(result["out"].values, np.log([1.0, np.e]))
+
+    def test_huge_exponent_is_rejected(self, simple_df):
+        # `9**9**9` is trivial to type and would otherwise hang the app.
+        with pytest.raises(ValueError, match="exceeds the limit"):
+            add_formula_column(simple_df, "bad", "9**9**9")
+
+    def test_overlong_expression_is_rejected(self, simple_df):
+        with pytest.raises(ValueError, match="too long"):
+            add_formula_column(simple_df, "bad", "x+" * 2000 + "x")
+
+    def test_non_callable_constant_cannot_be_called(self, simple_df):
+        with pytest.raises(ValueError, match="not a callable formula function"):
+            add_formula_column(simple_df, "bad", "pi(x)")
+
+    def test_module_does_not_call_builtin_eval(self):
+        # Guards against the old implementation being reintroduced.
+        import inspect
+
+        import modules.data_tools as dt
+
+        source = inspect.getsource(dt.add_formula_column)
+        assert "eval(" not in source or "_safe_eval(" in source
+        assert "__builtins__" not in inspect.getsource(dt._safe_eval)
+
+    @pytest.mark.parametrize(
+        "expression",
+        [
+            "x + 1",
+            "x * 2 - 1",
+            "log(x + 10)",
+            "sqrt(x) * pi",
+            "exp(x) / e",
+            "cumsum(x)",
+            "x / max(x)",
+            "mean(x) + std(x)",
+            "abs(-x)",
+            "x ** 2",
+            "(x + x) / 2",
+            "sin(x) + cos(x)",
+            "-x",
+            "nan * x",
+            "x if True else x * 2",
+        ],
+    )
+    def test_documented_expressions_still_work(self, simple_df, expression):
+        result = add_formula_column(simple_df, "ok", expression)
+        assert "ok" in result.columns
+        assert len(result) == len(simple_df)
+
+    def test_comparison_yields_a_boolean_mask(self, simple_df):
+        result = add_formula_column(simple_df, "mask", "x > 1")
+        assert result["mask"].isin([True, False, 0, 1]).all()
 
     def test_constants_available(self, simple_df):
         result = add_formula_column(simple_df, "pi_col", "x * pi")

@@ -10,4 +10,10 @@ plotting : Visualization and plotting tools
 gui : Interactive GUI components
 """
 
-__all__ = ["io", "math", "plotting", "gui"]
+# Single source of truth for the version. `pyproject.toml` reads this via
+# `[tool.setuptools.dynamic]`, and cli.py / Home.py / docs/conf.py import it, so
+# the number cannot drift between the package, the CLI, and the GUI.
+# See audit A-26.
+__version__ = "2.0.1"
+
+__all__ = ["io", "math", "plotting", "gui", "__version__"]

@@ -42,6 +42,7 @@ _ASSETS_DIR = _REPO_ROOT / "assets"
 _NCCU_HORIZ = _ASSETS_DIR / "nccu-horiz-logo.png"
 _NCCU_WINGS = _ASSETS_DIR / "nccu-wings.png"
 
+from modules import __version__  # noqa: E402
 from modules.utils import initialize_session_state, get_session_summary  # noqa: E402
 
 try:
@@ -59,7 +60,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
     menu_items={
         "About": (
-            "**Plottle** v2.0.0\n\n"
+            f"**Plottle** v{__version__}\n\n"
             "Scientific data visualization and analysis toolkit for research "
             "and teaching in computational science — developed at North Carolina "
             "Central University.\n\n"
@@ -134,7 +135,8 @@ def _home_page() -> None:
             )
             st.markdown(
                 "<p style='color: rgba(255,255,255,0.55); margin-top: 0;'>"
-                "Scientific data visualization and analysis &nbsp;&middot;&nbsp; v2.0.0"
+                "Scientific data visualization and analysis "
+                f"&nbsp;&middot;&nbsp; v{__version__}"
                 "</p>",
                 unsafe_allow_html=True,
             )
@@ -211,11 +213,11 @@ def _home_page() -> None:
                 """)
 
         st.markdown("## About")
-        st.markdown("""
+        st.markdown(f"""
         **Plottle** is developed at North Carolina Central University for research and teaching
         in computational science.
         Built with Streamlit · NumPy · Pandas · Matplotlib · Seaborn · Plotly · SciPy.
-        Version 2.0.0
+        Version {__version__}
         """)
 
 

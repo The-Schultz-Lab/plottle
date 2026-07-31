@@ -33,8 +33,10 @@ Time-series transforms:
 
 from __future__ import annotations
 
+import ast
 import math
-from typing import List, Optional
+import operator
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -68,6 +70,194 @@ _SAFE_MATH = {
 }
 
 
+# ─── Safe expression evaluation ───────────────────────────────────────────────
+#
+# Formula expressions arrive from a text input in the GUI, so they are
+# untrusted.  `eval(expr, {"__builtins__": {}}, ns)` is NOT a sandbox — the
+# empty-builtins trick is bypassed by walking the type hierarchy to reach an
+# importer, e.g.
+#
+#     [c for c in ().__class__.__bases__[0].__subclasses__()
+#      if c.__name__ == "BuiltinImporter"][0]().load_module("os")
+#
+# Every step of that escape needs attribute access, so the evaluator below
+# whitelists AST node types and rejects `ast.Attribute` outright.  Anything not
+# explicitly allowed raises ValueError rather than being evaluated.
+
+_BIN_OPS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod,
+    ast.Pow: operator.pow,
+}
+
+_UNARY_OPS = {
+    ast.UAdd: operator.pos,
+    ast.USub: operator.neg,
+    ast.Not: operator.not_,
+}
+
+_COMPARE_OPS = {
+    ast.Eq: operator.eq,
+    ast.NotEq: operator.ne,
+    ast.Lt: operator.lt,
+    ast.LtE: operator.le,
+    ast.Gt: operator.gt,
+    ast.GtE: operator.ge,
+}
+
+# Guards against expressions that are cheap to type and expensive to evaluate,
+# e.g. `9**9**9`, which would otherwise hang the app.
+_MAX_POW_EXPONENT = 1024
+_MAX_EXPRESSION_LENGTH = 2000
+
+
+def _safe_eval(expression: str, namespace: Dict[str, Any]) -> Any:
+    """Evaluate an arithmetic expression without exposing the Python runtime.
+
+    Supports numeric and boolean literals, the names in *namespace*, the binary
+    and unary arithmetic operators, comparisons, ``and``/``or``/``not``, tuples
+    and lists, subscripting, and calls to the whitelisted functions in
+    *namespace*.  Attribute access, imports, lambdas, comprehensions,
+    assignments, and every other construct are rejected.
+
+    Parameters
+    ----------
+    expression : str
+        Expression source.
+    namespace : dict
+        Names visible to the expression — the math helpers in ``_SAFE_MATH``
+        plus one entry per DataFrame column.
+
+    Returns
+    -------
+    Any
+        The value of the expression.
+
+    Raises
+    ------
+    ValueError
+        If the expression uses a construct that is not whitelisted, references
+        an unknown name, or exceeds the size/complexity guards.
+    """
+    if len(expression) > _MAX_EXPRESSION_LENGTH:
+        raise ValueError(
+            f"expression is too long ({len(expression)} characters; "
+            f"limit is {_MAX_EXPRESSION_LENGTH})"
+        )
+
+    try:
+        tree = ast.parse(expression, mode="eval")
+    except SyntaxError as exc:
+        raise ValueError(f"could not parse expression: {exc.msg}") from exc
+
+    def _describe(node: ast.AST) -> str:
+        if isinstance(node, ast.Attribute):
+            return "attribute access (e.g. `x.attr`) is not allowed in formulas"
+        if isinstance(
+            node, (ast.Lambda, ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)
+        ):
+            return f"`{type(node).__name__}` is not allowed in formulas"
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            return "imports are not allowed in formulas"
+        return f"`{type(node).__name__}` is not supported in formulas"
+
+    def _eval(node: ast.AST) -> Any:
+        if isinstance(node, ast.Expression):
+            return _eval(node.body)
+
+        if isinstance(node, ast.Constant):
+            if isinstance(node.value, (int, float, complex, bool)) or node.value is None:
+                return node.value
+            if isinstance(node.value, str):
+                return node.value
+            raise ValueError(f"literal of type {type(node.value).__name__} is not allowed")
+
+        if isinstance(node, ast.Name):
+            if node.id not in namespace:
+                raise ValueError(
+                    f"unknown name '{node.id}' — expected a column name or one of: "
+                    + ", ".join(sorted(_SAFE_MATH))
+                )
+            return namespace[node.id]
+
+        if isinstance(node, ast.BinOp):
+            op = _BIN_OPS.get(type(node.op))
+            if op is None:
+                raise ValueError(f"operator `{type(node.op).__name__}` is not allowed")
+            left, right = _eval(node.left), _eval(node.right)
+            if op is operator.pow and isinstance(right, (int, float)):
+                if abs(right) > _MAX_POW_EXPONENT:
+                    raise ValueError(f"exponent {right} exceeds the limit of {_MAX_POW_EXPONENT}")
+            return op(left, right)
+
+        if isinstance(node, ast.UnaryOp):
+            op = _UNARY_OPS.get(type(node.op))
+            if op is None:
+                raise ValueError(f"operator `{type(node.op).__name__}` is not allowed")
+            return op(_eval(node.operand))
+
+        if isinstance(node, ast.BoolOp):
+            values = [_eval(v) for v in node.values]
+            result = values[0]
+            for value in values[1:]:
+                result = (result & value) if isinstance(node.op, ast.And) else (result | value)
+            return result
+
+        if isinstance(node, ast.Compare):
+            result = None
+            left = _eval(node.left)
+            for op_node, comparator_node in zip(node.ops, node.comparators):
+                op = _COMPARE_OPS.get(type(op_node))
+                if op is None:
+                    raise ValueError(f"comparison `{type(op_node).__name__}` is not allowed")
+                right = _eval(comparator_node)
+                outcome = op(left, right)
+                result = outcome if result is None else (result & outcome)
+                left = right
+            return result
+
+        if isinstance(node, ast.Call):
+            # Only a bare whitelisted name may be called — never the result of
+            # another expression, which is how attribute-free escapes are built.
+            if not isinstance(node.func, ast.Name):
+                raise ValueError("only direct calls to the built-in formula functions are allowed")
+            if node.keywords:
+                raise ValueError("keyword arguments are not supported in formulas")
+            # Resolve against _SAFE_MATH directly rather than the namespace, so a
+            # column can never become callable no matter what it is named.
+            func = _SAFE_MATH.get(node.func.id)
+            if not callable(func):
+                raise ValueError(
+                    f"'{node.func.id}' is not a callable formula function — allowed: "
+                    + ", ".join(sorted(k for k, v in _SAFE_MATH.items() if callable(v)))
+                )
+            return func(*[_eval(arg) for arg in node.args])
+
+        if isinstance(node, (ast.Tuple, ast.List)):
+            return [_eval(elt) for elt in node.elts]
+
+        if isinstance(node, ast.Subscript):
+            return _eval(node.value)[_eval(node.slice)]
+
+        if isinstance(node, ast.Slice):
+            return slice(
+                _eval(node.lower) if node.lower else None,
+                _eval(node.upper) if node.upper else None,
+                _eval(node.step) if node.step else None,
+            )
+
+        if isinstance(node, ast.IfExp):
+            return _eval(node.body) if _eval(node.test) else _eval(node.orelse)
+
+        raise ValueError(_describe(node))
+
+    return _eval(tree)
+
+
 def add_formula_column(
     df: pd.DataFrame,
     new_col: str,
@@ -85,13 +275,19 @@ def add_formula_column(
     new_col : str
         Name for the new column.
     expression : str
-        A Python expression using column names and the math functions listed
-        below.  For example: ``"log(A) / B"`` or ``"(A - mean(A)) / std(A)"``.
+        An arithmetic expression using column names and the math functions
+        listed below.  For example: ``"log(A) / B"`` or
+        ``"(A - mean(A)) / std(A)"``.
 
         Available functions: ``log``, ``log2``, ``log10``, ``exp``, ``sqrt``,
         ``abs``, ``sin``, ``cos``, ``tan``, ``mean``, ``std``, ``min``,
         ``max``, ``sum``, ``cumsum``, ``diff`` (all operate on arrays).
         Constants: ``pi``, ``e``, ``nan``.
+
+        The expression is evaluated by :func:`_safe_eval`, which permits
+        arithmetic, comparisons, ``and``/``or``/``not``, conditional
+        expressions, subscripting, and calls to the functions above.  Attribute
+        access, imports, lambdas, comprehensions, and assignments are rejected.
 
     Returns
     -------
@@ -101,10 +297,12 @@ def add_formula_column(
     Raises
     ------
     ValueError
-        If *expression* is empty or *new_col* is empty.
+        If *expression* or *new_col* is empty, if *expression* cannot be
+        parsed, if it references an unknown name, or if it uses a construct
+        that is not whitelisted.
     Exception
-        Re-raised if the expression itself raises (e.g. ZeroDivisionError,
-        NameError for unknown column names).
+        Re-raised if evaluating a whitelisted expression itself raises — for
+        example ``ZeroDivisionError`` for ``"1 / 0"``.
     """
     if not expression.strip():
         raise ValueError("expression must not be empty")
@@ -116,7 +314,7 @@ def add_formula_column(
     for col in df.columns:
         namespace[col] = df[col].to_numpy(dtype=float, na_value=np.nan)
 
-    result = eval(expression, {"__builtins__": {}}, namespace)  # noqa: S307
+    result = _safe_eval(expression, namespace)
 
     out = df.copy()
     out[new_col] = result

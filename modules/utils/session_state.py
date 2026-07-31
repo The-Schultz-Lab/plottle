@@ -41,11 +41,10 @@ Examples
 import io
 import streamlit as st
 import json
-import pickle
 import base64
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 
@@ -248,8 +247,14 @@ def add_analysis_result(result_data: Dict):
     st.session_state.analysis_results.append(result_data)
 
 
-def _serialize_data(data: Any) -> Dict:
+def _serialize_data(data: Any) -> Any:
     """Serialize data for JSON storage.
+
+    Only types with a safe, self-describing encoding are serialized:
+    DataFrames (via ``to_json``), numeric/boolean ndarrays (via an explicit
+    dtype + shape + raw-buffer triple), JSON scalars, and lists/dicts of the
+    above.  Anything else is replaced by an ``unsupported`` placeholder rather
+    than being pickled — see Notes.
 
     Parameters
     ----------
@@ -258,15 +263,32 @@ def _serialize_data(data: Any) -> Dict:
 
     Returns
     -------
-    serialized : dict
-        Serialized representation
+    serialized : Any
+        Serialized representation — a dict for tagged types, otherwise the
+        value itself.
+
+    Notes
+    -----
+    Session files are written and re-read through the GUI's Export page, which
+    accepts uploads.  Any ``pickle``-based encoding would therefore make
+    "open a session file" equivalent to "execute arbitrary code", so pickle is
+    deliberately not used here.  Object-dtype arrays are also refused, since
+    their contents cannot be represented without pickling.
     """
     if isinstance(data, pd.DataFrame):
         return {"__type__": "DataFrame", "__data__": data.to_json(orient="split")}
     elif isinstance(data, np.ndarray):
+        if data.dtype.hasobject:
+            return {
+                "__type__": "unsupported",
+                "__class__": f"numpy.ndarray[{data.dtype}]",
+                "__reason__": "object-dtype arrays cannot be serialized safely",
+            }
         return {
             "__type__": "ndarray",
-            "__data__": base64.b64encode(pickle.dumps(data)).decode("utf-8"),
+            "__dtype__": data.dtype.str,
+            "__shape__": list(data.shape),
+            "__data__": base64.b64encode(np.ascontiguousarray(data).tobytes()).decode("utf-8"),
         }
     elif isinstance(data, (int, float, str, bool, type(None))):
         return data
@@ -275,38 +297,127 @@ def _serialize_data(data: Any) -> Dict:
     elif isinstance(data, dict):
         return {key: _serialize_data(value) for key, value in data.items()}
     else:
-        # Fallback: pickle and base64 encode
         return {
-            "__type__": "pickled",
-            "__data__": base64.b64encode(pickle.dumps(data)).decode("utf-8"),
+            "__type__": "unsupported",
+            "__class__": type(data).__name__,
+            "__reason__": "no safe JSON encoding for this type",
         }
 
 
-def _deserialize_data(data: Any) -> Any:
+def _decode_ndarray(data: Dict) -> np.ndarray:
+    """Rebuild an ndarray from a serialized dtype/shape/buffer triple.
+
+    Parameters
+    ----------
+    data : dict
+        Mapping with ``__dtype__``, ``__shape__``, and ``__data__`` keys as
+        written by :func:`_serialize_data`.
+
+    Returns
+    -------
+    numpy.ndarray
+        A writable array with the recorded dtype and shape.
+
+    Raises
+    ------
+    ValueError
+        If the dtype is absent, is an object dtype, or if the decoded buffer
+        length does not match ``dtype.itemsize * prod(shape)``.
+    """
+    dtype_str = data.get("__dtype__")
+    if not dtype_str:
+        raise ValueError("ndarray entry is missing '__dtype__'")
+
+    dtype = np.dtype(dtype_str)
+    if dtype.hasobject:
+        raise ValueError(f"refusing to decode object dtype {dtype!r}")
+
+    shape = tuple(int(n) for n in data.get("__shape__", ()))
+    if any(n < 0 for n in shape):
+        raise ValueError(f"invalid shape {shape}")
+
+    buf = base64.b64decode(data["__data__"])
+    # np.frombuffer validates that the buffer is a whole number of items, but
+    # not that it matches `shape`; check explicitly so a truncated or padded
+    # file fails here rather than producing a silently wrong array.
+    expected = dtype.itemsize * int(np.prod(shape, dtype=np.int64)) if shape else dtype.itemsize
+    if len(buf) != expected:
+        raise ValueError(
+            f"ndarray buffer is {len(buf)} bytes; expected {expected} "
+            f"for dtype {dtype.str} and shape {shape}"
+        )
+
+    # frombuffer returns a read-only view onto `buf`; copy so callers can write.
+    return np.frombuffer(buf, dtype=dtype).reshape(shape).copy()
+
+
+def _deserialize_data(data: Any, skipped: Optional[List[str]] = None) -> Any:
     """Deserialize data from JSON storage.
 
     Parameters
     ----------
     data : Any
         Serialized data
+    skipped : list of str, optional
+        If given, a human-readable note is appended for every entry that could
+        not be restored.  Callers use this to tell the user what was dropped.
 
     Returns
     -------
     deserialized : Any
-        Deserialized data
+        Deserialized data, or ``None`` for entries that could not be restored.
+
+    Notes
+    -----
+    Entries written by Plottle 2.0.1 and earlier used a pickle-based encoding
+    (``__type__`` of ``"pickled"``, and ``"ndarray"`` without a ``__dtype__``).
+    Those are refused rather than unpickled — see :func:`_serialize_data`.
     """
     if isinstance(data, dict):
-        if "__type__" in data:
-            if data["__type__"] == "DataFrame":
-                return pd.read_json(io.StringIO(data["__data__"]), orient="split")
-            elif data["__type__"] == "ndarray":
-                return pickle.loads(base64.b64decode(data["__data__"]))
-            elif data["__type__"] == "pickled":
-                return pickle.loads(base64.b64decode(data["__data__"]))
-        else:
-            return {key: _deserialize_data(value) for key, value in data.items()}
+        kind = data.get("__type__")
+        if kind is None:
+            return {key: _deserialize_data(value, skipped) for key, value in data.items()}
+
+        if kind == "DataFrame":
+            return pd.read_json(io.StringIO(data["__data__"]), orient="split")
+
+        if kind == "ndarray":
+            if "__dtype__" not in data:
+                if skipped is not None:
+                    skipped.append(
+                        "an array saved by Plottle 2.0.1 or earlier "
+                        "(pickle-encoded; refused for safety)"
+                    )
+                return None
+            try:
+                return _decode_ndarray(data)
+            except (ValueError, TypeError) as exc:
+                if skipped is not None:
+                    skipped.append(f"a corrupt array entry ({exc})")
+                return None
+
+        if kind == "pickled":
+            if skipped is not None:
+                skipped.append(
+                    f"a pickled {data.get('__class__', 'object')} saved by Plottle 2.0.1 "
+                    "or earlier (refused for safety)"
+                )
+            return None
+
+        if kind == "unsupported":
+            if skipped is not None:
+                skipped.append(
+                    f"{data.get('__class__', 'an object')} "
+                    f"({data.get('__reason__', 'unsupported type')})"
+                )
+            return None
+
+        if skipped is not None:
+            skipped.append(f"an entry of unrecognized type {kind!r}")
+        return None
+
     elif isinstance(data, list):
-        return [_deserialize_data(item) for item in data]
+        return [_deserialize_data(item, skipped) for item in data]
     else:
         return data
 
@@ -347,28 +458,49 @@ def save_session_to_file(filepath: str):
         json.dump(session_data, f, indent=2)
 
 
-def load_session_from_file(filepath: str):
+def load_session_from_file(filepath: str) -> List[str]:
     """Restore session state from JSON file.
 
     Parameters
     ----------
     filepath : str
         Path to session file
+
+    Returns
+    -------
+    skipped : list of str
+        One human-readable note per dataset that could not be restored — for
+        example entries saved by Plottle 2.0.1 or earlier, which used a
+        pickle-based encoding that is refused for safety.  Empty when the whole
+        session was restored.  Callers should surface this to the user.
     """
     filepath = Path(filepath)
     with open(filepath, "r") as f:
         session_data = json.load(f)
 
     # Deserialize datasets
+    skipped: List[str] = []
     st.session_state.datasets = {}
     for name, data in session_data["datasets"].items():
-        st.session_state.datasets[name] = _deserialize_data(data)
+        notes: List[str] = []
+        restored = _deserialize_data(data, notes)
+        if restored is None and notes:
+            skipped.extend(f"{name}: {note}" for note in notes)
+            continue
+        skipped.extend(f"{name}: {note}" for note in notes)
+        st.session_state.datasets[name] = restored
 
     st.session_state.dataset_metadata = session_data["dataset_metadata"]
     st.session_state.current_dataset = session_data["current_dataset"]
     st.session_state.plot_history = session_data["plot_history"]
     st.session_state.analysis_results = session_data["analysis_results"]
     st.session_state.plot_config = session_data["plot_config"]
+
+    # A dataset that was dropped must not stay selected.
+    if st.session_state.current_dataset not in st.session_state.datasets:
+        st.session_state.current_dataset = next(iter(st.session_state.datasets), None)
+
+    return skipped
 
 
 def clear_session():
